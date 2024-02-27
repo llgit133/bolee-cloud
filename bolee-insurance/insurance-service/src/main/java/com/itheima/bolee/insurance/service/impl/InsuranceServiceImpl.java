@@ -216,14 +216,12 @@ public class InsuranceServiceImpl extends ServiceImpl<InsuranceMapper, Insurance
     public InsuranceVO findById(String insuranceId) {
         try {
             //查询产品基本信息
-            InsuranceVO insuranceVO = BeanConv.toBean(getById(insuranceId), InsuranceVO.class);
-            if(!EmptyUtil.isNullOrEmpty(insuranceVO)){
+
                 //补全产品从属性
-                insuranceVO = buildResult(Lists.newArrayList(insuranceVO)).get(0);
+
                 //异步保存保险搜索记录
-                createSearchContent(Lists.newArrayList(insuranceVO), SubjectContent.getUserVO());
-            }
-            return insuranceVO;
+
+            return null;
         }catch (Exception e){
             log.error("保险产品单条查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(InsuranceEnum.FIND_ONE_FAIL);
@@ -342,68 +340,15 @@ public class InsuranceServiceImpl extends ServiceImpl<InsuranceMapper, Insurance
      */
     private List<InsuranceVO>  buildResult(List<InsuranceVO> insuranceVOs){
         //构建产品ID
-        List<Long> insuranceIds = insuranceVOs.stream().map(InsuranceVO::getId).collect(Collectors.toList());
+
         //=======================================封装产品系数项=======================================
-        InsuranceCoefficentVO insuranceCoefficentVO = InsuranceCoefficentVO.builder().
-            instanceIds(insuranceIds.toArray(Long[]::new)).
-            dataState(SuperConstant.DATA_STATE_0).
-            build();
-        List<InsuranceCoefficentVO> insuranceCoefficentList = insuranceCoefficentService.findList(insuranceCoefficentVO);
-        if(!EmptyUtil.isNullOrEmpty(insuranceCoefficentList)) {
-            // 封装保险系数项到InsuranceVO的coefficents属性
-            insuranceVOs.forEach(insuranceVOHandler -> {
-                //过滤出同一个保险id下的数据
-                List<InsuranceCoefficentVO> matchingCoefficents = insuranceCoefficentList.stream()
-                    .filter(coefficent -> coefficent.getInsuranceId().equals(insuranceVOHandler.getId()))
-                    .collect(Collectors.toList());
-                insuranceVOHandler.setInsuranceCoefficentVOs(matchingCoefficents);
-            });
-        }
+
         //=======================================封装产品方案=======================================
-        InsurancePlanVO insurancePlanVO = InsurancePlanVO.builder().
-            insuranceIds(insuranceIds.toArray(Long[]::new)).
-            dataState(SuperConstant.DATA_STATE_0).
-            build();
-        List<InsurancePlanVO> insurancePlanVOList = insurancePlanService.findList(insurancePlanVO);
-        if(!EmptyUtil.isNullOrEmpty(insurancePlanVOList)) {
-            // 封装保险系数项到InsuranceVO的insurancePlan属性
-            insuranceVOs.forEach(insuranceVOHandler -> {
-                List<InsurancePlanVO> insurancePlanVOs = insurancePlanVOList.stream()
-                    .filter(insurancePlanIndex -> insurancePlanIndex.getInsuranceId().equals(insuranceVOHandler.getId()))
-                    .collect(Collectors.toList());
-                insuranceVOHandler.setInsurancePlanVOs(insurancePlanVOs);
-            });
-        }
+
         //=======================================封装产品筛选项=======================================
-        InsuranceConditionVO insuranceConditionVO = InsuranceConditionVO.builder()
-            .insuranceIds(insuranceIds.toArray(Long[]::new))
-            .dataState(SuperConstant.DATA_STATE_0)
-            .build();
-        List<InsuranceConditionVO> insuranceConditionList = insuranceConditionService.findList(insuranceConditionVO);
-        if(!EmptyUtil.isNullOrEmpty(insuranceConditionList)) {
-            // 封装保险系数项到InsuranceVO的insurancePlan属性
-            insuranceVOs.forEach(insuranceVOHandler -> {
-                List<InsuranceConditionVO> insuranceConditionVOS = insuranceConditionList.stream()
-                    .filter(insuranceConditionItem -> String.valueOf(insuranceVOHandler.getId()).equals(insuranceConditionItem.getInsuranceId()))
-                    .collect(Collectors.toList());
-                insuranceVOHandler.setInsuranceConditionVOs(insuranceConditionVOS);
-            });
-        }
+
         //=======================================封装附件=============================================
-        //调用fileBusinessFeign附件信息
-        List<FileVO> fileVOs = fileBusinessFeign.findInBusinessIds(insuranceIds);
-        if(!EmptyUtil.isNullOrEmpty(fileVOs)) {
-            insuranceVOs.forEach(insuranceVOHandler -> {
-                //构建附件处理List对象
-                List<FileVO> fileVOsHandler = Lists.newArrayList();
-                fileVOs.forEach(fileVO -> {
-                    if (insuranceVOHandler.getId().equals(fileVO.getBusinessId())) {
-                        fileVOsHandler.add(fileVO);
-                    }
-                });
-                insuranceVOHandler.setFileVOs(fileVOsHandler);
-            });
-        }
+
         //====================================================================================
         return insuranceVOs;
     }
@@ -459,19 +404,9 @@ public class InsuranceServiceImpl extends ServiceImpl<InsuranceMapper, Insurance
         searchRecordExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                ArrayList<SearchRecord> searchRecordList = new ArrayList<>();
-                for (InsuranceVO insuranceVO: insuranceVOs) {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.set("insuranceId",insuranceVO.getId());
-                    jsonObject.set("insuranceName",insuranceVO.getInsuranceName());
-                    SearchRecord searchRecord = SearchRecord.builder()
-                        .dataState(SuperConstant.DATA_STATE_0)
-                        .content(jsonObject.toString())
-                        .createBy(userVO.getId()).
-                    build();
-                    searchRecordList.add(searchRecord);
-                }
-                searchRecordService.saveBatch(searchRecordList);
+                //构建searchRecordList
+
+                //保持记录
             }
         });
     }

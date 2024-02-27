@@ -86,8 +86,8 @@ public class ProductController {
     @ApiOperation(value = "保险产品详情",notes = "保险产品详情")
     @ApiImplicitParam(name = "insuranceId",value = "保险id",required = true,dataType = "String")
     public ResponseResult<InsuranceVO> findInsuranceDetails(@PathVariable("insuranceId")String insuranceId){
-        InsuranceVO insuranceVO = insuranceService.findById(insuranceId);
-        return ResponseResultBuild.successBuild(insuranceVO);
+
+        return null;
     }
 
 }

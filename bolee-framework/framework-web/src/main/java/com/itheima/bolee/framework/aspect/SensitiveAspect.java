@@ -23,19 +23,14 @@ public class SensitiveAspect {
     @Around(value = "@annotation(sensitiveResponse)")
     public Object select(ProceedingJoinPoint  joinPoint, SensitiveResponse sensitiveResponse) throws Throwable {
         // 执行目标方法
-        Object result = joinPoint.proceed();
+
         // 获取目标方法
-        Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+
         // 获取目标方法的泛型返回类型
-        Type genericReturnType = method.getGenericReturnType();
-        if (!EmptyUtil.isNullOrEmpty(result)){
-            // 进行脱敏处理
-            String jsonResponse = JSONObject.toJSONString(result);
-            String maskedResponse = maskSensitiveData(jsonResponse);
-            // 将脱敏后的数据转换为实际返回类型
-            return JSONObject.parseObject(maskedResponse,genericReturnType);
-        }
-        return result;
+
+        // 进行脱敏处理
+
+        return null;
     }
 
 
