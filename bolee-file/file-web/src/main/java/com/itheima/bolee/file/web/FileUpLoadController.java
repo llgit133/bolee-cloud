@@ -47,16 +47,13 @@ public class FileUpLoadController {
     public ResponseResult<FileVO> upLoad(
             @RequestParam("file") MultipartFile file,
             FileVO fileVO) throws IOException {
+        //指定企业编号
         fileVO.setCompanyNo(SubjectContent.getCompanyNo());
         //构建文件上传对象
-        UploadMultipartFile uploadMultipartFile = UploadMultipartFile
-            .builder()
-            .originalFilename(file.getOriginalFilename())
-            .fileByte(IOUtils.toByteArray(file.getInputStream()))
-            .build();
+
         //执行文件上传
-        FileVO fileVOResult = fileService.upLoad(uploadMultipartFile, fileVO);
-        return ResponseResultBuild.successBuild(fileVOResult);
+
+        return null;
 
     }
 
@@ -65,10 +62,11 @@ public class FileUpLoadController {
     @ApiImplicitParam(name = "fileVO",value = "文件对象",required = true,dataType = "FileVO")
     public ResponseResult<FileVO> initiateMultipartUpload(
             @RequestBody FileVO fileVO){
-        fileVO.setCompanyNo(SubjectContent.getCompanyNo());
+        //指定企业编号
+
         //初始化上传Id
-        FileVO fileVOResult = fileService.initiateMultipartUpload(fileVO);
-        return ResponseResultBuild.successBuild(fileVOResult);
+
+        return null;
     }
 
     @PostMapping(value = "up-load-part")
@@ -79,16 +77,13 @@ public class FileUpLoadController {
     public ResponseResult<String> uploadPart(
             @RequestParam("file") MultipartFile file,
             FilePartVO filePartVO)throws IOException {
-        filePartVO.setCompanyNo(SubjectContent.getCompanyNo());
+        //指定企业编号
+
         //构建文件上次对象
-        UploadMultipartFile uploadMultipartFile = UploadMultipartFile
-            .builder()
-            .originalFilename(file.getOriginalFilename())
-            .fileByte(IOUtils.toByteArray(file.getInputStream()))
-            .build();
+
         //上传分片返回partETagJson
-        String partETagJson = fileService.uploadPart(uploadMultipartFile,filePartVO);
-        return ResponseResultBuild.successBuild(partETagJson);
+
+        return null;
     }
 
     @PostMapping(value = "complete-multipart-up-load")
@@ -97,8 +92,8 @@ public class FileUpLoadController {
     public ResponseResult<String> completeMultipartUpload(
             @RequestBody FileVO fileVO)throws IOException {
         //问上传分片返回partETagJson
-        String eTagJson = fileService.completeMultipartUpload(fileVO);
-        return ResponseResultBuild.successBuild(eTagJson);
+
+        return null;
     }
 
 }

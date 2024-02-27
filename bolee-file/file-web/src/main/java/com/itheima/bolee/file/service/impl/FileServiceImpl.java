@@ -177,18 +177,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     public FileVO bindFile(FileVO fileVO) {
         try {
             //修改file表中的businessId
-            File file = BeanConv.toBean(fileVO, File.class);
-            boolean flag = updateById(file);
+
             //构建完整返回对象
-            if (flag){
-                QueryWrapper<File> queryWrapper = new QueryWrapper();
-                queryWrapper.lambda().eq(File::getBusinessId,fileVO.getBusinessId());
-                File fileResult = getOne(queryWrapper);
-                if (!EmptyUtil.isNullOrEmpty(file)){
-                    fileResult.setPathUrl(fileUrlContext.getFileUrl(fileResult.getStoreFlag(), fileResult.getPathUrl()));
-                }
-                return BeanConv.toBean(fileResult,FileVO.class);
-            }
+
             return null;
         }catch (Exception e){
             log.error("查询文件分页异常：{}", ExceptionsUtil.getStackTraceAsString(e));
@@ -202,24 +193,12 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
             @CacheEvict(value = FileCacheConstant.BASIC,allEntries = true),
             @CacheEvict(value = FileCacheConstant.BUSINESS_KEY,key = "#fileVOs.get(0).getBusinessId()")})
     public List<FileVO> bindBatchFile(List<FileVO> fileVOs) {
-        Long businessId = fileVOs.get(0).getBusinessId();
-        if (EmptyUtil.isNullOrEmpty(businessId)) {
-            throw new ProjectException(FileEnum.SELECT_BUSUBBESSID_FAIL);
-        }
+        //fileVOs获得业务ID
+
         try {
             //修改file表中的businessId
-            updateBatchById(BeanConv.toBeanList(fileVOs, File.class));
-            QueryWrapper<File> queryWrapper = new QueryWrapper();
-            queryWrapper.lambda().eq(File::getBusinessId,businessId);
-            List<File> files = list(queryWrapper);
-            //构建完整返回对象
-            if (!EmptyUtil.isNullOrEmpty(files)){
-                files.forEach(n->{
-                    String fileUrl = fileUrlContext.getFileUrl(n.getStoreFlag(), n.getPathUrl());
-                    n.setPathUrl(fileUrl);
-                });
-            }
-            return BeanConv.toBeanList(files,FileVO.class);
+
+            return null;
         } catch (Exception e) {
             log.error("绑定业务：{}异常：{}", fileVOs.toString(),ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(FileEnum.BIND_FAIL);
@@ -235,12 +214,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     public Boolean replaceBindFile(FileVO fileVO) {
         try {
             //删除老图片
-            ArrayList<Long> ids = Lists.newArrayList();
-            ids.add(fileVO.getId());
-            deleteInIds(ids);
+
             //绑定新图片
-           FileVO fileVOResult = bindFile(fileVO);
-            return !EmptyUtil.isNullOrEmpty(fileVOResult);
+
+            return null;
         }catch (Exception e){
             log.error("查询文件分页异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(FileEnum.BIND_FAIL);
@@ -257,27 +234,12 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     public Boolean replaceBindBatchFile(List<FileVO> fileVOs) {
         try {
             //查询当前业务图片
-            QueryWrapper<File> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().eq(File::getBusinessId,fileVOs.get(0).getBusinessId());
-            List<File> oldList = list(queryWrapper);
-            List<Long> oldIds = oldList.stream().map(File::getId).collect(Collectors.toList());
-            List<Long> newIds = fileVOs.stream().map(FileVO::getId).collect(Collectors.toList());
+
             //删除：老图片对新图片的差集
-            List<Long> delIds = oldIds.stream().filter(n -> {
-                return !newIds.contains(n);
-            }).collect(Collectors.toList());
-            if (!EmptyUtil.isNullOrEmpty(delIds)){
-                deleteInIds(delIds);
-            }
+
             //绑定新图片
-            List<FileVO> newFiles = fileVOs.stream().filter(n -> {
-                return !oldIds.contains(n.getId());
-            }).collect(Collectors.toList());
-            if (!EmptyUtil.isNullOrEmpty(newFiles)){
-                List<FileVO> fileVOsResult = bindBatchFile(newFiles);
-                return !EmptyUtil.isNullOrEmpty(fileVOsResult);
-            }
-            return true;
+
+            return null;
         }catch (Exception e){
             log.error("查询文件分页异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(FileEnum.BIND_FAIL);
@@ -310,22 +272,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     public Boolean deleteInBusinessIds(List<Long> businessIds) {
         try {
             //删除数据库
-            List<FileVO> files = findInBusinessIds(businessIds);
-            UpdateWrapper<File> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.lambda().in(File::getBusinessId,businessIds);
-            Boolean flag = remove(updateWrapper);
-            if (!flag){
-                throw new ProjectException(FileEnum.DELETE_FAIL);
-            }
+
             //删除OSS中的图片
-            if (!EmptyUtil.isNullOrEmpty(files)){
-                List<String> getPathUrls = files.stream().map(FileVO::getPathUrl).collect(Collectors.toList());
-                FileVO fileVO = files.get(0);
-                String bucketName = fileVO.getBucketName();
-                String storeFlag = fileVO.getStoreFlag();
-                fileStorageAdapter.deleteBatch(storeFlag,bucketName,getPathUrls);
-            }
-            return flag;
+
+            return null;
         }catch (Exception e){
             log.error("删除业务对应附件：{}失败",businessIds);
             throw new ProjectException(FileEnum.DELETE_FILE_BUSINESSID_FAIL);
@@ -365,18 +315,12 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     public Boolean clearFile() {
         try {
             //查询需要清理的文件
-            List<FileVO> fileList = needClearFile();
-            if (EmptyUtil.isNullOrEmpty(fileList)){
-                return true;
-            }
-            List<Long> fileListIds = fileList.stream().map(FileVO::getId).collect(Collectors.toList());
+
             //移除数据库信息
-            Boolean flag =  removeByIds(fileListIds);
+
             //移除对象存储数据
-            for (FileVO fileVO : fileList) {
-                fileStorageAdapter.delete(fileVO.getStoreFlag(),fileVO.getBucketName(),fileVO.getPathUrl());
-            }
-            return flag;
+
+            return null;
         }catch (Exception e){
             log.error("定时清理文件异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(FileEnum.CLEAR_FILE_TASK_FAIL);
@@ -434,52 +378,26 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     @Transactional
     public FileVO upLoad(UploadMultipartFile multipartFile, FileVO fileVO) throws ProjectException {
         //获得文件ByteArrayInputStream
-        ByteArrayInputStream byteArrayInputStream =new ByteArrayInputStream(multipartFile.getFileByte());
+
         try {
             //文件重命名
-            String filename = identifierGenerator.nextId(fileVO)+"-"+multipartFile.getOriginalFilename();;
-            fileVO.setFileName(filename);
+
             //文件后缀名
-            String suffix = fileVO.getFileName().substring(fileVO.getFileName().lastIndexOf("."));
-            fileVO.setSuffix(suffix);
+
             //调用简单上传
-            String pathUrl = fileStorageAdapter.uploadFile(fileVO, byteArrayInputStream);
+
             //保存数据库
-            File file = BeanConv.toBean(fileVO, File.class);
-            file.setStatus(FileConstant.STATUS_SUCCEED);
-            file.setPathUrl(pathUrl);
-            boolean flag = save(file);
-            if (!flag){
-                throw new ProjectException(FileEnum.UPLOAD_FAIL);
-            }
+
             //补全完整路径
-            pathUrl = fileUrlContext.getFileUrl(fileVO.getStoreFlag(), pathUrl);
-            fileVO.setId(file.getId());
-            fileVO.setPathUrl(pathUrl);
+
             //发送延迟信息:上传如果超过10分钟不进行文件业务绑定则会被消息队列清空
-            Long messageId = (Long) identifierGenerator.nextId(fileVO);
-            MqMessage mqMessage = MqMessage.builder()
-                .id(messageId)
-                .title("file-message")
-                .content(JSONObject.toJSONString(fileVO))
-                .messageType("file-request")
-                .produceTime(Timestamp.valueOf(LocalDateTime.now()))
-                .sender("system")
-                .build();
-            Message<MqMessage> message = MessageBuilder.withPayload(mqMessage).setHeader("x-delay", fileDelayTime).build();
-            fileSource.fileOutput().send(message);
-            return fileVO;
+
+            return null;
         }catch (Exception e) {
             log.error("文件上传异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(FileEnum.UPLOAD_FAIL);
         }finally {
-            if (byteArrayInputStream != null) {
-                try {
-                    byteArrayInputStream.close();
-                } catch (Exception e) {
-                    log.error("文件上传操作失败：{}", ExceptionsUtil.getStackTraceAsString(e));
-                }
-            }
+            //关闭流
         }
     }
 
@@ -492,41 +410,19 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     public FileVO initiateMultipartUpload(FileVO fileVO) {
         try {
             //文件重命名
-            String filename = identifierGenerator.nextId(fileVO)+"-"+fileVO.getFileName();
-            fileVO.setFileName(filename);
+
             //文件后缀名
-            String suffix = fileVO.getFileName().substring(fileVO.getFileName().lastIndexOf("."));
-            fileVO.setSuffix(suffix);
+
             //分片上传-初始化
-            File file  =  fileStorageAdapter.initiateMultipartUpload(fileVO);
+
             //保存数据库
-            file.setBusinessType(fileVO.getBusinessType());
-            file.setSuffix(suffix);
-            file.setStoreFlag(fileVO.getStoreFlag());
-            file.setMd5(fileVO.getMd5());
-            file.setCompanyNo(fileVO.getCompanyNo());
-            file.setStatus(FileConstant.STATUS_SENDING);
-            boolean flag = save(file);
-            if (!flag){
-                throw new ProjectException(FileEnum.UPLOAD_FAIL);
-            }
+
+
             //补全完整路径
-            FileVO fileVOResult = BeanConv.toBean(file, FileVO.class);
-            String pathUrl = fileUrlContext.getFileUrl(fileVOResult.getStoreFlag(), fileVOResult.getPathUrl());
-            fileVOResult.setPathUrl(pathUrl);
+
             //发送队列信息:上传如果超过10分钟不进行文件业务绑定则会被消息队列清空
-            Long messageId = (Long) identifierGenerator.nextId(fileVOResult);
-            MqMessage mqMessage = MqMessage.builder()
-                .id(messageId)
-                .title("file-message")
-                .content(JSONObject.toJSONString(fileVOResult))
-                .messageType("file-request")
-                .produceTime(Timestamp.valueOf(LocalDateTime.now()))
-                .sender("system")
-                .build();
-            Message<MqMessage> message = MessageBuilder.withPayload(mqMessage).setHeader("x-delay", fileDelayTime).build();
-            fileSource.fileOutput().send(message);
-            return fileVOResult;
+
+            return null;
         } catch (Exception e) {
             log.error("文件上传初始化异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(FileEnum.INIT_UPLOAD_FAIL);
@@ -538,12 +434,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     public String uploadPart(UploadMultipartFile multipartFile, FilePartVO filePartVO) {
         try {
             //上传分片数据
-            String partETagString = fileStorageAdapter.uploadPart(filePartVO, new ByteArrayInputStream(multipartFile.getFileByte()));
+
             //保存分片信息
-            FilePart filePart = BeanConv.toBean(filePartVO, FilePart.class);
-            filePart.setUploadResult(partETagString);
-            filePartService.save(filePart);
-            return partETagString;
+
+            return null;
         }catch (Exception e) {
             log.error("文件分片上传异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(FileEnum.UPLOAD_PART_FAIL);
@@ -555,18 +449,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     public String completeMultipartUpload(FileVO fileVO) {
         try {
             //移除分片记录
-            Boolean flag = filePartService.deleteFilePartByUpLoadId(fileVO.getUploadId());
-            if (!flag){
-                throw new ProjectException(FileEnum.COMPLETE_PART_FAIL);
-            }
+
             //修改文件记录状态
-            fileVO.setStatus(FileConstant.STATUS_SUCCEED);
-            flag = updateById(BeanConv.toBean(fileVO,File.class));
-            if (!flag){
-                throw new ProjectException(FileEnum.COMPLETE_PART_FAIL);
-            }
+
             //合并结果
-            return fileStorageAdapter.completeMultipartUpload(fileVO);
+            return null;
         } catch (Exception e) {
             log.error("文件分片上传异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(FileEnum.COMPLETE_PART_FAIL);
