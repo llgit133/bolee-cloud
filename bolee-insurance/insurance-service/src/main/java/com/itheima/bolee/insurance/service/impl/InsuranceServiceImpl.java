@@ -441,9 +441,11 @@ public class InsuranceServiceImpl extends ServiceImpl<InsuranceMapper, Insurance
     @Override
     public EarningVO doEarnings(DoInsureVo doInsureVo) {
         try {
-            String checkRule = insuranceTypeMap.get(doInsureVo.getCheckRule());
-            InsureHandler insureHandler = registerBeanHandler.getBean(checkRule, InsureHandler.class);
-            return insureHandler.doEarnings(doInsureVo);
+            //传入checkRule参数从insuranceTypeMap中依据K值找到V值，也就是拿到处理类的bean名称
+
+            //依据bean名称通过IOC容器工具类从IOC中获得具体的保处理接口的某个实现类去处理具体的业务
+
+            return null;
         }catch (Exception e){
             log.error("收益计算异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(InsuranceEnum.INCOME_FAIL);

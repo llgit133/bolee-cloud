@@ -239,51 +239,31 @@ public class EarningsInsureHandler implements InsureHandler {
     @Override
     public EarningVO doEarnings(DoInsureVo doInsureVo) {
         //不支持团险
-        if (doInsureVo.getCustomerRelationIds().size()>1){
-            throw new RuntimeException("不支持团险");
-        }
+
         //不支持指定生效期
-        if (!EmptyUtil.isNullOrEmpty(doInsureVo.getSafeguardStartTime())){
-            throw new RuntimeException("不支持指定生效期");
-        }
+
         //投保对象信息
-        InsureProcessVO insureProcessVO = insureProcessHandler.buildInsureProcessVO(doInsureVo.getInsuranceId(),
-            doInsureVo.getInsurancePlanId(),
-            doInsureVo.getCompanyNo(),
-            doInsureVo.getInsuranceCoefficentIds());
+
         //保险产品
-        InsuranceVO insuranceVO = insureProcessVO.getInsuranceVO();
+
         //保险方案
-        InsurancePlanVO insurancePlanVO = insureProcessVO.getInsurancePlanVO();
+
         //保险系数
-        List<InsuranceCoefficentVO> coefficentVOs = insureProcessVO.getCoefficents();
+
         //投保人信息
-        CustomerRelationVO applicant = insureProcessHandler.buildApplicant();
+
         //被投保人信息
-        CustomerRelationVO insured = insureProcessHandler.buildInsured(doInsureVo.getCustomerRelationIds().get(0));
+
         //系数唯一性检查
-        Boolean flag = insureProcessHandler.checkBaseOnly(coefficentVOs);
-        if (!flag){
-            throw new RuntimeException("相同系数多于2个!");
-        }
+
         //理财保险必填参数检测
-        flag = insureProcessHandler.checkEarnings(coefficentVOs);
-        if (!flag){
-            throw new RuntimeException("理财型保险缺少必填参数!");
-        }
+
         //检查投保年龄是否符合检测
-        flag = insureProcessHandler.checkAge(insuranceVO,insured);
-        if (!flag){
-            throw new RuntimeException("投保年龄不符合!");
-        }
+
         //理财投保金额是否符合检测
-        flag = insureProcessHandler.checkPrice(insurancePlanVO,
-                coefficentVOs,doInsureVo.getPrice());
-        if (!flag){
-            throw new RuntimeException("投保金额不符合!");
-        }
+
         //试算收益
-        return insureProcessHandler.earningsCompute(null,applicant,doInsureVo,insurancePlanVO, coefficentVOs, insured,true);
+        return null;
     }
 
     @Override
