@@ -81,29 +81,16 @@ public class CoefficentServiceImpl extends ServiceImpl<CoefficentMapper, Coeffic
     public Page<CoefficentVO> findPage(CoefficentVO coefficentVO, int pageNum, int pageSize) {
         try {
             //构建分页对象
-            Page<Coefficent> CoefficentPage = new Page<>(pageNum,pageSize);
+
             //构建查询条件
-            QueryWrapper<Coefficent> queryWrapper = queryWrapper(coefficentVO);
+
             //执行分页查询
-            Page<CoefficentVO> coefficentVOPage = BeanConv.toPage(
-                page(CoefficentPage, queryWrapper), CoefficentVO.class);
+
             //返回结果
-            return coefficentVOPage;
+            return null;
         }catch (Exception e){
             log.error("系数项分页查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(CoefficentEnum.PAGE_FAIL);
-        }
-    }
-
-    @Override
-    @Cacheable(value = CoefficentCacheConstant.BASIC,key ="#coefficentId")
-    public CoefficentVO findById(String coefficentId) {
-        try {
-            //执行查询
-            return BeanConv.toBean(getById(coefficentId),CoefficentVO.class);
-        }catch (Exception e){
-            log.error("系数项单条查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
-            throw new ProjectException(CoefficentEnum.FIND_ONE_FAIL);
         }
     }
 
@@ -115,14 +102,10 @@ public class CoefficentServiceImpl extends ServiceImpl<CoefficentMapper, Coeffic
     public CoefficentVO save(CoefficentVO coefficentVO) {
         try {
             //转换CoefficentVO为Coefficent
-            Coefficent coefficent = BeanConv.toBean(coefficentVO, Coefficent.class);
-            boolean flag = save(coefficent);
-            if (!flag){
-                throw new RuntimeException("保存系数项失败");
-            }
+
             //转换返回对象CoefficentVO
-            CoefficentVO coefficentVOHandler = BeanConv.toBean(coefficent, CoefficentVO.class);
-            return coefficentVOHandler;
+
+            return null;
         }catch (Exception e){
             log.error("保存系数项异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(CoefficentEnum.SAVE_FAIL);
@@ -137,35 +120,11 @@ public class CoefficentServiceImpl extends ServiceImpl<CoefficentMapper, Coeffic
     public Boolean update(CoefficentVO coefficentVO) {
         try {
             //转换CoefficentVO为Coefficent
-            Coefficent coefficent = BeanConv.toBean(coefficentVO, Coefficent.class);
-            boolean flag = updateById(coefficent);
-            if (!flag){
-                throw new RuntimeException("修改系数项失败");
-            }
-            return flag;
+
+            return null;
         }catch (Exception e){
             log.error("修改系数项异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(CoefficentEnum.UPDATE_FAIL);
-        }
-    }
-
-    @Override
-    @Transactional
-    @Caching(evict = {@CacheEvict(value = CoefficentCacheConstant.PAGE,allEntries = true),
-        @CacheEvict(value = CoefficentCacheConstant.LIST,allEntries = true),
-        @CacheEvict(value = CoefficentCacheConstant.BASIC,allEntries = true)})
-    public Boolean delete(String[] checkedIds) {
-        try {
-            List<Long> idsLong = Arrays.asList(checkedIds)
-                .stream().map(Long::new).collect(Collectors.toList());
-            boolean flag = removeByIds(idsLong);
-            if (!flag){
-                throw new RuntimeException("删除系数项失败");
-            }
-            return flag;
-        }catch (Exception e){
-            log.error("删除系数项异常：{}", ExceptionsUtil.getStackTraceAsString(e));
-            throw new ProjectException(CoefficentEnum.DEL_FAIL);
         }
     }
 
@@ -174,10 +133,10 @@ public class CoefficentServiceImpl extends ServiceImpl<CoefficentMapper, Coeffic
     public List<CoefficentVO> findList(CoefficentVO coefficentVO) {
         try {
             //构建查询条件
-            QueryWrapper<Coefficent> queryWrapper = queryWrapper(coefficentVO);
+
             //执行列表查询
-            List<CoefficentVO> coefficentVOs = BeanConv.toBeanList(list(queryWrapper),CoefficentVO.class);
-            return coefficentVOs;
+
+            return null;
         }catch (Exception e){
             log.error("系数项列表查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(CoefficentEnum.LIST_FAIL);
@@ -189,13 +148,39 @@ public class CoefficentServiceImpl extends ServiceImpl<CoefficentMapper, Coeffic
     public CoefficentVO findByCoefficentKey(String coefficentKey) {
         try {
             //构建查询条件
-            QueryWrapper<Coefficent> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().eq(Coefficent::getCoefficentKey,coefficentKey)
-                    .eq(Coefficent::getDataState, SuperConstant.DATA_STATE_0);
+
             //执行列表查询
-            return  BeanConv.toBean(getOne(queryWrapper),CoefficentVO.class);
+            return null;
         }catch (Exception e){
             log.error("系数项查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
+            throw new ProjectException(CoefficentEnum.FIND_ONE_FAIL);
+        }
+    }
+
+    @Override
+    @Transactional
+    @Caching(evict = {@CacheEvict(value = CoefficentCacheConstant.PAGE,allEntries = true),
+            @CacheEvict(value = CoefficentCacheConstant.LIST,allEntries = true),
+            @CacheEvict(value = CoefficentCacheConstant.BASIC,allEntries = true)})
+    public Boolean delete(String[] checkedIds) {
+        try {
+            //构建IDS
+
+            return null;
+        }catch (Exception e){
+            log.error("删除系数项异常：{}", ExceptionsUtil.getStackTraceAsString(e));
+            throw new ProjectException(CoefficentEnum.DEL_FAIL);
+        }
+    }
+
+    @Override
+    @Cacheable(value = CoefficentCacheConstant.BASIC,key ="#coefficentId")
+    public CoefficentVO findById(String coefficentId) {
+        try {
+            //执行查询
+            return BeanConv.toBean(getById(coefficentId),CoefficentVO.class);
+        }catch (Exception e){
+            log.error("系数项单条查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(CoefficentEnum.FIND_ONE_FAIL);
         }
     }

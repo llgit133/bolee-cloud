@@ -80,29 +80,16 @@ public class ConditionServiceImpl extends ServiceImpl<ConditionMapper, Condition
     public Page<ConditionVO> findPage(ConditionVO conditionVO, int pageNum, int pageSize) {
         try {
             //构建分页对象
-            Page<Condition> ConditionPage = new Page<>(pageNum,pageSize);
+
             //构建查询条件
-            QueryWrapper<Condition> queryWrapper = queryWrapper(conditionVO);
+
             //执行分页查询
-            Page<ConditionVO> conditionVOPage = BeanConv.toPage(
-                page(ConditionPage, queryWrapper), ConditionVO.class);
+
             //返回结果
-            return conditionVOPage;
+            return null;
         }catch (Exception e){
             log.error("筛选项分页查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(ConditionEnum.PAGE_FAIL);
-        }
-    }
-
-    @Override
-    @Cacheable(value = ConditionCacheConstant.BASIC,key ="#conditionId")
-    public ConditionVO findById(String conditionId) {
-        try {
-            //执行查询
-            return BeanConv.toBean(getById(conditionId),ConditionVO.class);
-        }catch (Exception e){
-            log.error("筛选项单条查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
-            throw new ProjectException(ConditionEnum.FIND_ONE_FAIL);
         }
     }
 
@@ -114,14 +101,10 @@ public class ConditionServiceImpl extends ServiceImpl<ConditionMapper, Condition
     public ConditionVO save(ConditionVO conditionVO) {
         try {
             //转换ConditionVO为Condition
-            Condition condition = BeanConv.toBean(conditionVO, Condition.class);
-            boolean flag = save(condition);
-            if (!flag){
-                throw new RuntimeException("保存筛选项失败");
-            }
+
             //转换返回对象ConditionVO
-            ConditionVO conditionVOHandler = BeanConv.toBean(condition, ConditionVO.class);
-            return conditionVOHandler;
+
+            return null;
         }catch (Exception e){
             log.error("保存筛选项异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(ConditionEnum.SAVE_FAIL);
@@ -136,35 +119,11 @@ public class ConditionServiceImpl extends ServiceImpl<ConditionMapper, Condition
     public Boolean update(ConditionVO conditionVO) {
         try {
             //转换ConditionVO为Condition
-            Condition condition = BeanConv.toBean(conditionVO, Condition.class);
-            boolean flag = updateById(condition);
-            if (!flag){
-                throw new RuntimeException("修改筛选项失败");
-            }
-            return flag;
+
+            return null;
         }catch (Exception e){
             log.error("修改筛选项异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(ConditionEnum.UPDATE_FAIL);
-        }
-    }
-
-    @Override
-    @Transactional
-    @Caching(evict = {@CacheEvict(value = ConditionCacheConstant.PAGE,allEntries = true),
-        @CacheEvict(value = ConditionCacheConstant.LIST,allEntries = true),
-        @CacheEvict(value = ConditionCacheConstant.BASIC,allEntries = true)})
-    public Boolean delete(String[] checkedIds) {
-        try {
-            List<Long> idsLong = Arrays.asList(checkedIds)
-                .stream().map(Long::new).collect(Collectors.toList());
-            boolean flag = removeByIds(idsLong);
-            if (!flag){
-                throw new RuntimeException("删除筛选项失败");
-            }
-            return flag;
-        }catch (Exception e){
-            log.error("删除筛选项异常：{}", ExceptionsUtil.getStackTraceAsString(e));
-            throw new ProjectException(ConditionEnum.DEL_FAIL);
         }
     }
 
@@ -173,10 +132,10 @@ public class ConditionServiceImpl extends ServiceImpl<ConditionMapper, Condition
     public List<ConditionVO> findList(ConditionVO conditionVO) {
         try {
             //构建查询条件
-            QueryWrapper<Condition> queryWrapper = queryWrapper(conditionVO);
+
             //执行列表查询
-            List<ConditionVO> conditionVOs = BeanConv.toBeanList(list(queryWrapper),ConditionVO.class);
-            return conditionVOs;
+
+            return null;
         }catch (Exception e){
             log.error("筛选项列表查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(ConditionEnum.LIST_FAIL);
@@ -188,14 +147,41 @@ public class ConditionServiceImpl extends ServiceImpl<ConditionMapper, Condition
     public List<ConditionVO> findInConditionKeys(List<String> conditionKeys) {
         try {
             //构建查询条件
-            QueryWrapper<Condition> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().in(Condition::getConditionKey,conditionKeys);
+
             //执行列表查询
-            List<ConditionVO> conditionVOs = BeanConv.toBeanList(list(queryWrapper),ConditionVO.class);
-            return conditionVOs;
+
+            return null;
         }catch (Exception e){
             log.error("筛选项列表查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(ConditionEnum.LIST_FAIL);
+        }
+    }
+
+    @Override
+    @Transactional
+    @Caching(evict = {@CacheEvict(value = ConditionCacheConstant.PAGE,allEntries = true),
+            @CacheEvict(value = ConditionCacheConstant.LIST,allEntries = true),
+            @CacheEvict(value = ConditionCacheConstant.BASIC,allEntries = true)})
+    public Boolean delete(String[] checkedIds) {
+        try {
+            //构建IDS
+
+            return null;
+        }catch (Exception e){
+            log.error("删除筛选项异常：{}", ExceptionsUtil.getStackTraceAsString(e));
+            throw new ProjectException(ConditionEnum.DEL_FAIL);
+        }
+    }
+
+    @Override
+    @Cacheable(value = ConditionCacheConstant.BASIC,key ="#conditionId")
+    public ConditionVO findById(String conditionId) {
+        try {
+            //执行查询
+            return BeanConv.toBean(getById(conditionId),ConditionVO.class);
+        }catch (Exception e){
+            log.error("筛选项单条查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
+            throw new ProjectException(ConditionEnum.FIND_ONE_FAIL);
         }
     }
 }

@@ -49,8 +49,8 @@ public class CoefficentController {
                                     @RequestBody CoefficentVO coefficentVO,
                                     @PathVariable("pageNum") int pageNum,
                                     @PathVariable("pageSize") int pageSize) {
-        Page<CoefficentVO> coefficentVOPage = coefficentService.findPage(coefficentVO, pageNum, pageSize);
-        return ResponseResultBuild.successBuild(coefficentVOPage);
+
+        return null;
     }
 
     /**
@@ -63,8 +63,8 @@ public class CoefficentController {
     @ApiImplicitParam(name = "coefficentVO",value = "系数项VO对象",required = true,dataType = "CoefficentVO")
     @ApiOperationSupport(includeParameters = {"coefficentVO.dataState","coefficentVO.coefficentKey","coefficentVO.coefficentKeyName","coefficentVO.coefficentVal","coefficentVO.sortNo","coefficentVO.remake","coefficentVO.coefficentType"})
     public ResponseResult<CoefficentVO> createCoefficent(@RequestBody CoefficentVO coefficentVO) {
-        CoefficentVO coefficentVOResult = coefficentService.save(coefficentVO);
-        return ResponseResultBuild.successBuild(coefficentVOResult);
+
+        return null;
     }
 
     /**
@@ -77,8 +77,8 @@ public class CoefficentController {
     @ApiImplicitParam(name = "coefficentVO",value = "系数项VO对象",required = true,dataType = "CoefficentVO")
     @ApiOperationSupport(includeParameters = {"coefficentVO.id","coefficentVO.dataState","coefficentVO.coefficentKey","coefficentVO.coefficentKeyName","coefficentVO.coefficentVal","coefficentVO.sortNo","coefficentVO.remake","coefficentVO.coefficentType"})
     public ResponseResult<Boolean> updateCoefficent(@RequestBody CoefficentVO coefficentVO) {
-        Boolean flag = coefficentService.update(coefficentVO);
-        return ResponseResultBuild.successBuild(flag);
+
+        return null;
     }
 
     /**
@@ -91,8 +91,8 @@ public class CoefficentController {
     @ApiImplicitParam(name = "coefficentVO",value = "系数项VO对象",required = true,dataType = "CoefficentVO")
     @ApiOperationSupport(includeParameters = {"coefficentVO.checkedIds"})
     public ResponseResult<Boolean> deleteCoefficent(@RequestBody CoefficentVO coefficentVO) {
-        Boolean flag = coefficentService.delete(coefficentVO.getCheckedIds());
-        return ResponseResultBuild.successBuild(flag);
+
+        return null;
     }
 
     /***
@@ -105,8 +105,8 @@ public class CoefficentController {
     @ApiImplicitParam(name = "coefficentVO",value = "系数项VO对象",required = true,dataType = "CoefficentVO")
     @ApiOperationSupport(includeParameters = {"coefficentVO.dataState","coefficentVO.coefficentKey","coefficentVO.coefficentKeyName","coefficentVO.coefficentVal","coefficentVO.sortNo","coefficentVO.remake","coefficentVO.coefficentType"})
     public ResponseResult<List<CoefficentVO>> coefficentList(@RequestBody CoefficentVO coefficentVO) {
-        List<CoefficentVO> coefficentVOList = coefficentService.findList(coefficentVO);
-        return ResponseResultBuild.successBuild(coefficentVOList);
+
+        return null;
     }
 
     /***
@@ -118,7 +118,7 @@ public class CoefficentController {
     @ApiOperation(value = "系数项key查询CoefficentVO",notes = "系数项key查询CoefficentVO")
     @ApiImplicitParam(paramType = "path",name = "coefficentKey",value = "系数项key",dataType = "String")
     public ResponseResult<CoefficentVO> findByCoefficentKey(@PathVariable("coefficentKey") String coefficentKey) {
-        CoefficentVO coefficentVO = coefficentService.findByCoefficentKey(coefficentKey);
-        return ResponseResultBuild.successBuild(coefficentVO);
+
+        return null;
     }
 }

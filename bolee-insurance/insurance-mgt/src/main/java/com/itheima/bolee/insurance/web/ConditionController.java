@@ -47,8 +47,8 @@ public class ConditionController {
                                     @RequestBody ConditionVO conditionVO,
                                     @PathVariable("pageNum") int pageNum,
                                     @PathVariable("pageSize") int pageSize) {
-        Page<ConditionVO> conditionVOPage = conditionService.findPage(conditionVO, pageNum, pageSize);
-        return ResponseResultBuild.successBuild(conditionVOPage);
+
+        return null;
     }
 
     /**
@@ -61,8 +61,8 @@ public class ConditionController {
     @ApiImplicitParam(name = "conditionVO",value = "筛选项VO对象",required = true,dataType = "ConditionVO")
     @ApiOperationSupport(includeParameters = {"conditionVO.dataState","conditionVO.conditionKey","conditionVO.conditionKeyName","conditionVO.conditionVal","conditionVO.sortNo","conditionVO.remake"})
     public ResponseResult<ConditionVO> createCondition(@RequestBody ConditionVO conditionVO) {
-        ConditionVO conditionVOResult = conditionService.save(conditionVO);
-        return ResponseResultBuild.successBuild(conditionVOResult);
+
+        return null;
     }
 
     /**
@@ -75,8 +75,8 @@ public class ConditionController {
     @ApiImplicitParam(name = "conditionVO",value = "筛选项VO对象",required = true,dataType = "ConditionVO")
     @ApiOperationSupport(includeParameters = {"conditionVO.id","conditionVO.dataState","conditionVO.conditionKey","conditionVO.conditionKeyName","conditionVO.conditionVal","conditionVO.sortNo","conditionVO.remake"})
     public ResponseResult<Boolean> updateCondition(@RequestBody ConditionVO conditionVO) {
-        Boolean flag = conditionService.update(conditionVO);
-        return ResponseResultBuild.successBuild(flag);
+
+        return null;
     }
 
     /**
@@ -89,8 +89,8 @@ public class ConditionController {
     @ApiImplicitParam(name = "conditionVO",value = "筛选项VO对象",required = true,dataType = "ConditionVO")
     @ApiOperationSupport(includeParameters = {"conditionVO.checkedIds"})
     public ResponseResult<Boolean> deleteCondition(@RequestBody ConditionVO conditionVO) {
-        Boolean flag = conditionService.delete(conditionVO.getCheckedIds());
-        return ResponseResultBuild.successBuild(flag);
+
+        return null;
     }
 
     /***
@@ -103,8 +103,8 @@ public class ConditionController {
     @ApiImplicitParam(name = "conditionVO",value = "筛选项VO对象",required = true,dataType = "ConditionVO")
     @ApiOperationSupport(includeParameters = {"conditionVO.dataState","conditionVO.conditionKey","conditionVO.conditionKeyName","conditionVO.conditionVal","conditionVO.sortNo","conditionVO.remake"})
     public ResponseResult<List<ConditionVO>> conditionList(@RequestBody ConditionVO conditionVO) {
-        List<ConditionVO> conditionVOList = conditionService.findList(conditionVO);
-        return ResponseResultBuild.successBuild(conditionVOList);
+
+        return null;
     }
 
 }

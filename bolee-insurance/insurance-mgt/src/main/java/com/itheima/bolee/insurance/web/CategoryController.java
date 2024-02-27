@@ -48,8 +48,8 @@ public class CategoryController {
                                     @RequestBody CategoryVO categoryVO,
                                     @PathVariable("pageNum") int pageNum,
                                     @PathVariable("pageSize") int pageSize) {
-        Page<CategoryVO> categoryVOPage = categoryService.findPage(categoryVO, pageNum, pageSize);
-        return ResponseResultBuild.successBuild(categoryVOPage);
+
+        return null;
     }
 
     /**
@@ -128,8 +128,8 @@ public class CategoryController {
     @ApiImplicitParam(name = "categoryVO",value = "分类对象",required = false,dataType = "CategoryVO")
     @ApiOperationSupport(includeParameters = {"categoryVO.parentCategoryNo","categoryVO.categoryType","categoryVO.checkedCategoryNos"})
     public ResponseResult<TreeVO> categoryTreeVO(@RequestBody CategoryVO categoryVO) {
-        TreeVO treeVO = categoryService.categoryTreeVO(categoryVO.getParentCategoryNo(), categoryVO.getCategoryType(),categoryVO.getCheckedCategoryNos());
-        return ResponseResultBuild.successBuild(treeVO);
+
+        return null;
     }
 
 }

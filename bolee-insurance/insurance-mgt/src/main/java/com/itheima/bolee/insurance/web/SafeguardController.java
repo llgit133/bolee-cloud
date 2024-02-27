@@ -47,8 +47,8 @@ public class SafeguardController {
                                     @RequestBody SafeguardVO safeguardVO,
                                     @PathVariable("pageNum") int pageNum,
                                     @PathVariable("pageSize") int pageSize) {
-        Page<SafeguardVO> safeguardVOPage = safeguardService.findPage(safeguardVO, pageNum, pageSize);
-        return ResponseResultBuild.successBuild(safeguardVOPage);
+
+        return null;
     }
 
     /**
@@ -61,8 +61,8 @@ public class SafeguardController {
     @ApiImplicitParam(name = "safeguardVO",value = "保障项VO对象",required = true,dataType = "SafeguardVO")
     @ApiOperationSupport(includeParameters = {"safeguardVO.dataState","safeguardVO.safeguardKey","safeguardVO.safeguardKeyName","safeguardVO.safeguardVal","safeguardVO.safeguardType","safeguardVO.sortNo","safeguardVO.remake"})
     public ResponseResult<SafeguardVO> createSafeguard(@RequestBody SafeguardVO safeguardVO) {
-        SafeguardVO safeguardVOResult = safeguardService.save(safeguardVO);
-        return ResponseResultBuild.successBuild(safeguardVOResult);
+
+        return null;
     }
 
     /**
@@ -75,22 +75,8 @@ public class SafeguardController {
     @ApiImplicitParam(name = "safeguardVO",value = "保障项VO对象",required = true,dataType = "SafeguardVO")
     @ApiOperationSupport(includeParameters = {"safeguardVO.id","safeguardVO.dataState","safeguardVO.safeguardKey","safeguardVO.safeguardKeyName","safeguardVO.safeguardVal","safeguardVO.safeguardType","safeguardVO.sortNo","safeguardVO.remake"})
     public ResponseResult<Boolean> updateSafeguard(@RequestBody SafeguardVO safeguardVO) {
-        Boolean flag = safeguardService.update(safeguardVO);
-        return ResponseResultBuild.successBuild(flag);
-    }
 
-    /**
-     * @Description 删除保障项
-     * @param safeguardVO 刪除条件：checkedIds 不可为空
-     * @return
-     */
-    @DeleteMapping
-    @ApiOperation(value = "删除保障项",notes = "删除保障项")
-    @ApiImplicitParam(name = "safeguardVO",value = "保障项VO对象",required = true,dataType = "SafeguardVO")
-    @ApiOperationSupport(includeParameters = {"safeguardVO.checkedIds"})
-    public ResponseResult<Boolean> deleteSafeguard(@RequestBody SafeguardVO safeguardVO) {
-        Boolean flag = safeguardService.delete(safeguardVO.getCheckedIds());
-        return ResponseResultBuild.successBuild(flag);
+        return null;
     }
 
     /***
@@ -103,8 +89,23 @@ public class SafeguardController {
     @ApiImplicitParam(name = "safeguardVO",value = "保障项VO对象",required = true,dataType = "SafeguardVO")
     @ApiOperationSupport(includeParameters = {"safeguardVO.dataState","safeguardVO.safeguardKey","safeguardVO.safeguardKeyName","safeguardVO.safeguardVal","safeguardVO.safeguardType","safeguardVO.sortNo","safeguardVO.remake"})
     public ResponseResult<List<SafeguardVO>> safeguardList(@RequestBody SafeguardVO safeguardVO) {
-        List<SafeguardVO> safeguardVOList = safeguardService.findList(safeguardVO);
-        return ResponseResultBuild.successBuild(safeguardVOList);
+
+        return null;
+    }
+
+
+    /**
+     * @Description 删除保障项
+     * @param safeguardVO 刪除条件：checkedIds 不可为空
+     * @return
+     */
+    @DeleteMapping
+    @ApiOperation(value = "删除保障项",notes = "删除保障项")
+    @ApiImplicitParam(name = "safeguardVO",value = "保障项VO对象",required = true,dataType = "SafeguardVO")
+    @ApiOperationSupport(includeParameters = {"safeguardVO.checkedIds"})
+    public ResponseResult<Boolean> deleteSafeguard(@RequestBody SafeguardVO safeguardVO) {
+
+        return null;
     }
 
     /***

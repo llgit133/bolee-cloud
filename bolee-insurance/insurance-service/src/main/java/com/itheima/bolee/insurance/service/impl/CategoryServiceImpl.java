@@ -125,48 +125,25 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     public Page<CategoryVO> findPage(CategoryVO categoryVO, int pageNum, int pageSize) {
         try {
             //构建分页对象
-            Page<Category> CategoryPage = new Page<>(pageNum,pageSize);
+
             //构建查询条件
-            QueryWrapper<Category> queryWrapper = queryWrapper(categoryVO);
+
             //执行分页查询
-            Page<CategoryVO> categoryVOPage = BeanConv
-                .toPage(page(CategoryPage, queryWrapper), CategoryVO.class);
-            if (!EmptyUtil.isNullOrEmpty(categoryVOPage.getRecords())){
+
+            //组合子属性
+
                 //构建分类编号Set
-                Set<String> categoryNoSet = categoryVOPage.getRecords().stream().map(CategoryVO::getCategoryNo).collect(Collectors.toSet());
+
                 //查询分类筛选项
-                List<CategoryConditionVO> categoryConditionVOs = categoryConditionService.findListInCategoryNo(categoryNoSet);
+
                 //查询分类保障项
-                List<CategorySafeguardVO> categorySafeguardVOs = categorySafeguardService.findListInCategoryNo(categoryNoSet);
+
                 //查询分类系数项
-                List<CategoryCoefficentVO> categoryCoefficentVOs = categoryCoefficentService.findListInCategoryNo(categoryNoSet);
-                //组合子属性
-                categoryVOPage.getRecords().forEach(n->{
-                    List<CategoryConditionVO> categoryConditionVOsHandler = Lists.newArrayList();
-                    List<CategorySafeguardVO> categorySafeguardVOsHandler = Lists.newArrayList();
-                    List<CategoryCoefficentVO> categoryCoefficentVOsHandler = Lists.newArrayList();
-                    categoryConditionVOs.forEach(y->{
-                        if (n.getCategoryNo().equals(y.getCategoryNo())) {
-                            categoryConditionVOsHandler.add(y);
-                        }
-                    });
-                    categorySafeguardVOs.forEach(z->{
-                        if (n.getCategoryNo().equals(z.getCategoryNo())) {
-                            categorySafeguardVOsHandler.add(z);
-                        }
-                    });
-                    categoryCoefficentVOs.forEach(e->{
-                        if (n.getCategoryNo().equals(e.getCategoryNo())) {
-                            categoryCoefficentVOsHandler.add(e);
-                        }
-                    });
-                    n.setCategoryConditionVOs(categoryConditionVOsHandler);
-                    n.setCategorySafeguardVOs(categorySafeguardVOsHandler);
-                    n.setCategoryCoefficentVOs(categoryCoefficentVOsHandler);
-                });
-            }
+
+                //匹配属性
+
             //返回结果
-            return categoryVOPage;
+            return null;
         }catch (Exception e){
             log.error("保险分类分页查询异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(CategoryEnum.PAGE_FAIL);
@@ -327,66 +304,31 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     public TreeVO categoryTreeVO(String parentCategoryNo, String categoryType,String[] checkedCategoryNos) {
         try {
             //起始节点确定
-            String parentCategoryNoHandler = EmptyUtil.isNullOrEmpty(parentCategoryNo)?
-                SuperConstant.ROOT_PARENT_ID:parentCategoryNo;
+
             //起始节点子节点
-            QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda()
-                .eq(Category::getDataState, SuperConstant.DATA_STATE_0)
-                .likeRight(Category::getParentCategoryNo,NoProcessing.processString(parentCategoryNoHandler))
-                .orderByAsc(Category::getCategoryNo);
-            if (!EmptyUtil.isNullOrEmpty(categoryType)){
-                queryWrapper.lambda().eq(Category::getCategoryType,categoryType);
-            }
-            List<Category> categoryList = list(queryWrapper);
-            if (EmptyUtil.isNullOrEmpty(categoryList)){
-                throw new RuntimeException("分类信息未定义！");
-            }
+
+            //类型不为空，添加到条件中
+
             //构建展开节点
-            List<String> expandedIds = new ArrayList<>();
+
             //构建选中节点
-            List<String> checkedCategoryNosHandler = !EmptyUtil.isNullOrEmpty(checkedCategoryNos)?
-                Lists.newArrayList(checkedCategoryNos):null;
+
             //构建List<TreeItemVO>对象
-            List<TreeItemVO> treeItemVOs  = categoryList.stream()
-                .map(category->{
-                    //构建当前节点
-                    TreeItemVO treeItemVO = TreeItemVO.builder()
-                        .id(category.getCategoryNo())
-                        .parentId(category.getParentCategoryNo())
-                        .label(category.getCategoryName())
-                        .build();
-                    //当前节点是否选择
-                    if (!EmptyUtil.isNullOrEmpty(checkedCategoryNosHandler)
-                        &&checkedCategoryNosHandler.contains(category.getCategoryNo())){
-                        treeItemVO.setIsChecked(true);
-                    }else {
-                        treeItemVO.setIsChecked(false);
-                    }
-                    //当前节点展开处理
-                    if(NoProcessing.processString(category.getCategoryNo()).length()/3==3){
-                        expandedIds.add(category.getCategoryNo());
-                    }
-                    return treeItemVO;}).collect(Collectors.toList());
+
+                //构建当前节点
+
+                //当前节点是否选择
+
+                //当前节点展开处理
+
             //数据进行分组（key-->parentId:val-->List<TreeItemVO>）
-            Map<String, List<TreeItemVO>> parentParentIdMap = treeItemVOs.stream()
-                .collect(Collectors.groupingBy(TreeItemVO::getParentId));
+
             //遍历回填子节点
-            treeItemVOs.forEach(treeItemVO -> {
-                //根据父编号到map中查找是否包含子菜单，如果包含则设置为当前菜单的子菜单
-                List<TreeItemVO> menuVos = parentParentIdMap.get(treeItemVO.getId());
-                if(!EmptyUtil.isNullOrEmpty(menuVos)){
-                    treeItemVO.setChildren(menuVos);
-                }
-            });
+
             //构建treeItemVOResult
-            List<TreeItemVO> treeItemVOResult= parentParentIdMap.get(parentCategoryNoHandler);
+
             //返回TreeVO
-            return TreeVO.builder()
-                .items(treeItemVOResult)
-                .checkedIds(checkedCategoryNosHandler)
-                .expandedIds(expandedIds)
-                .build();
+            return null;
         } catch (Exception e) {
             log.error("查询分类表TREE异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(CategoryEnum.TREE_FAIL);
