@@ -124,12 +124,8 @@ public class InsuranceCoefficentServiceImpl extends ServiceImpl<InsuranceCoeffic
     public Boolean save(List<InsuranceCoefficentVO> insuranceCoefficentVOs) {
         try {
             //转换InsuranceCoefficentVO为InsuranceCoefficent
-            List<InsuranceCoefficent> insuranceCoefficents = BeanConv.toBeanList(insuranceCoefficentVOs, InsuranceCoefficent.class);
-            boolean flag = saveBatch(insuranceCoefficents);
-            if (!flag){
-                throw new RuntimeException("保存保险系数项失败");
-            }
-            return flag;
+
+            return null;
         }catch (Exception e){
             log.error("保存保险系数项异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(InsuranceCoefficentEnum.SAVE_FAIL);
@@ -143,17 +139,10 @@ public class InsuranceCoefficentServiceImpl extends ServiceImpl<InsuranceCoeffic
     public Boolean update(List<InsuranceCoefficentVO> insuranceCoefficentVOs) {
         try {
             //删除所有的保险系数
-            Boolean flagRemove = deleteByInsuranceId(insuranceCoefficentVOs.get(0).getInsuranceId());
-            if(!flagRemove){
-                throw new RuntimeException("保险系数项删除失败");
-            }
+
             //转换InsuranceCoefficentVO为InsuranceCoefficent
-            List<InsuranceCoefficent> insuranceCoefficents = BeanConv.toBeanList(insuranceCoefficentVOs, InsuranceCoefficent.class);
-            boolean flag = saveBatch(insuranceCoefficents);
-            if (!flag){
-                throw new RuntimeException("修改保险系数项失败");
-            }
-            return flag;
+
+            return null;
         }catch (Exception e){
             log.error("修改保险系数项异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(InsuranceCoefficentEnum.UPDATE_FAIL);

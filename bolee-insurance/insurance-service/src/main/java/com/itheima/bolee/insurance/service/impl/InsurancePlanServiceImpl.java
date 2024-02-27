@@ -158,48 +158,24 @@ public class InsurancePlanServiceImpl extends ServiceImpl<InsurancePlanMapper, I
     public Boolean save(List<InsurancePlanVO> insurancePlanVOs) {
         try {
             //创建方案编号
-            insurancePlanVOs.forEach(n->n.setPlanNo(identifierGenerator.nextId(insurancePlanVOs).longValue()));
+
             //保存产品方案
-            List<InsurancePlan> insurancePlans = BeanConv.toBeanList(insurancePlanVOs, InsurancePlan.class);
-            boolean flag = saveBatch(insurancePlans);
-            if (!flag){
-                throw new RuntimeException("保存保险方案失败");
-            }
+
             //构建方案保障项List对象
-            List<PlanSafeguardVO> planSafeguardVOs = Lists.newArrayList();
+
             //构建方案给付计划List对象
-            List<PlanEarningsVO> planEarningsVOs = Lists.newArrayList();
+
             //回填产品方案ID
-            insurancePlanVOs.forEach(ipv->{
-                insurancePlans.forEach(ip->{
+
                     //产品保障项：回填产品方案ID
-                    if (ipv.getPlanNo().equals(ip.getPlanNo())){
-                        ipv.getPlanSafeguardVOs().forEach(y->{
-                            y.setPlanId(ip.getId());
-                        });
-                    }
+
                     //产品给付计划：回填产品方案ID
-                    if (ipv.getPlanNo().equals(ip.getPlanNo())&&
-                        !EmptyUtil.isNullOrEmpty(ipv.getPlanEarningsVO())){
-                        ipv.getPlanEarningsVO().setPalnId(ip.getId());
-                    }
-                });
-                planEarningsVOs.add(ipv.getPlanEarningsVO());
-                planSafeguardVOs.addAll(ipv.getPlanSafeguardVOs());
-            });
+
             //保存方案保障项
-            flag = planSafeguardService.saveBatch(BeanConv.toBeanList(planSafeguardVOs,PlanSafeguard.class));
-            if (!flag){
-                throw new RuntimeException("保存保险方案保障项失败");
-            }
+
             //保存方案给付计划
-            if (!EmptyUtil.isNullOrEmpty(planEarningsVOs)){
-                flag =planEarningsService.saveBatch(BeanConv.toBeanList(planEarningsVOs,PlanEarnings.class));
-                if (!flag){
-                    throw new RuntimeException("保存保险方案给付失败");
-                }
-            }
-            return flag;
+
+            return null;
         }catch (Exception e){
             log.error("保存保险方案异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(InsurancePlanEnum.SAVE_FAIL);
@@ -213,29 +189,17 @@ public class InsurancePlanServiceImpl extends ServiceImpl<InsurancePlanMapper, I
     public Boolean update(List<InsurancePlanVO> insurancePlanVOs) {
         try {
             //查询原产品方案
-            QueryWrapper<InsurancePlan> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().eq(InsurancePlan::getInsuranceId,insurancePlanVOs.get(0).getInsuranceId());
-            List<InsurancePlan> insurancePlans = list(queryWrapper);
+
             //删除原产品方案
-            List<Long> insurancePlanIds = insurancePlans.stream().map(InsurancePlan::getId).collect(Collectors.toList());
-            boolean flag = removeByIds(insurancePlanIds);
-            if (!flag){
-                throw new RuntimeException("删除保险方案失败");
-            }
+
             //删除原产品方案保障项
-            flag = planSafeguardService.deleteInPlanIds(insurancePlanIds);
-            if (!flag){
-                throw new RuntimeException("删除方案保障项失败");
-            }
+
             //删除原产品方案给付计划
-            planEarningsService.deleteInPlanIds(insurancePlanIds);
-            if (!flag){
-                throw new RuntimeException("删除方案给付计划失败");
-            }
+
             //清空产品方案ID
-            insurancePlanVOs.forEach(n->n.setId(null));
+
             //再次重新保存
-            return this.save(insurancePlanVOs);
+            return null;
         }catch (Exception e){
             log.error("修改保险方案异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(InsurancePlanEnum.UPDATE_FAIL);

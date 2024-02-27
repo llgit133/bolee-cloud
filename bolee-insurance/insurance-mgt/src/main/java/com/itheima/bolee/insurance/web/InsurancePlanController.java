@@ -39,8 +39,8 @@ public class InsurancePlanController {
     @ApiOperation(value = "保存InsurancePlan",notes = "添加InsurancePlan")
     @ApiImplicitParam(name = "insurancePlanVOs",value = "保险方案VO对象",required = true,dataType = "InsurancePlanVO")
     public ResponseResult<Boolean> createInsurancePlans(@RequestBody List<InsurancePlanVO> insurancePlanVOs) {
-        Boolean flag=insurancePlanService.save(insurancePlanVOs);
-        return ResponseResultBuild.successBuild(flag);
+
+        return null;
     }
 
     /**
@@ -52,8 +52,8 @@ public class InsurancePlanController {
     @ApiOperation(value = "修改保险方案",notes = "修改保险方案")
     @ApiImplicitParam(name = "insurancePlanVOs",value = "保险方案VO对象",required = true,dataType = "InsurancePlanVO")
     public ResponseResult<Boolean> updateInsurancePlan(@RequestBody List<InsurancePlanVO> insurancePlanVOs) {
-        Boolean flag = insurancePlanService.update(insurancePlanVOs);
-        return ResponseResultBuild.successBuild(true);
+
+        return null;
     }
 
     /***

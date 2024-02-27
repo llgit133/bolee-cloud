@@ -240,13 +240,9 @@ public class InsuranceServiceImpl extends ServiceImpl<InsuranceMapper, Insurance
     public InsuranceVO save(InsuranceVO insuranceVO) {
         try {
             //转换InsuranceVO为Insurance
-            Insurance insurance = BeanConv.toBean(insuranceVO, Insurance.class);
-            boolean flag = save(insurance);
-            if (!flag){
-                throw new RuntimeException("保存保险产品失败");
-            }
+
             //转换返回对象InsuranceVO
-            return BeanConv.toBean(insurance, InsuranceVO.class);
+            return null;
         }catch (Exception e){
             log.error("保存保险产品异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(InsuranceEnum.SAVE_FAIL);
@@ -261,8 +257,8 @@ public class InsuranceServiceImpl extends ServiceImpl<InsuranceMapper, Insurance
     public Boolean update(InsuranceVO insuranceVO) {
         try {
             //转换InsuranceVO为Insurance
-            Insurance insurance = BeanConv.toBean(insuranceVO, Insurance.class);
-            return updateById(insurance);
+
+            return null;
         }catch (Exception e){
             log.error("修改保险产品异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(InsuranceEnum.UPDATE_FAIL);

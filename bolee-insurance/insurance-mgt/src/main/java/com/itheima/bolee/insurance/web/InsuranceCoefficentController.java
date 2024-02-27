@@ -35,8 +35,8 @@ public class InsuranceCoefficentController {
     @ApiOperation(value = "保存InsuranceCoefficent",notes = "添加InsuranceCoefficent")
     @ApiImplicitParam(name = "insuranceCoefficentVOs",value = "保险系数项VO对象",required = true,dataType = "InsuranceCoefficentVO")
     public ResponseResult<Boolean> createInsuranceCoefficent(@RequestBody List<InsuranceCoefficentVO> insuranceCoefficentVOs) {
-        Boolean flag = insuranceCoefficentService.save(insuranceCoefficentVOs);
-        return ResponseResultBuild.successBuild(flag);
+
+        return null;
     }
 
 
@@ -49,8 +49,8 @@ public class InsuranceCoefficentController {
     @ApiOperation(value = "修改保险系数项",notes = "修改保险系数项")
     @ApiImplicitParam(name = "insuranceCoefficentVOs",value = "保险系数项VO对象",required = true,dataType = "InsuranceCoefficentVO")
     public ResponseResult<Boolean> updateInsuranceCoefficent(@RequestBody List<InsuranceCoefficentVO> insuranceCoefficentVOs) {
-        Boolean flag = insuranceCoefficentService.update(insuranceCoefficentVOs);
-        return ResponseResultBuild.successBuild(flag);
+
+        return null;
     }
 
     /***
