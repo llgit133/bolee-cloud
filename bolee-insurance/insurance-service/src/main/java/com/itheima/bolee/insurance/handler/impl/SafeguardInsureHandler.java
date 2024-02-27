@@ -246,45 +246,29 @@ public class SafeguardInsureHandler implements InsureHandler {
     @Override
     public String doPremium(DoInsureVo doInsureVo) {
         //判断个险类
-        if (doInsureVo.getCustomerRelationIds().size()>1){
-            throw new RuntimeException("不支持团险");
-        }
+
         //个险类：不支持指定生效期
-        if (!EmptyUtil.isNullOrEmpty(doInsureVo.getSafeguardStartTime())){
-            throw new RuntimeException("不支持指定生效期");
-        }
+
         //投保对象信息
-        InsureProcessVO insureProcessVO = insureProcessHandler.buildInsureProcessVO(doInsureVo.getInsuranceId(),
-            doInsureVo.getInsurancePlanId(),
-            doInsureVo.getCompanyNo(),
-            doInsureVo.getInsuranceCoefficentIds());
+
         //保险产品
-        InsuranceVO insuranceVO = insureProcessVO.getInsuranceVO();
+
         //保险方案
-        InsurancePlanVO insurancePlanVO = insureProcessVO.getInsurancePlanVO();
+
         //保险系数
-        List<InsuranceCoefficentVO> coefficentVOs = insureProcessVO.getCoefficents();
+
         //被投保人信息
-        CustomerRelationVO insured = insureProcessHandler.buildInsured(doInsureVo.getCustomerRelationIds().get(0));
+
         //检测投保年龄
-        Boolean flag = insureProcessHandler.checkAge(insuranceVO,insured);
-        if (!flag){
-            return "-1";
-        }
+
         //检查系数唯一性
-        flag = insureProcessHandler.checkBaseOnly(coefficentVOs);
-        if (!flag){
-            throw new RuntimeException("相同系数多于2个!");
-        }
+
         //检测个险型必填系数
-        flag = insureProcessHandler.checkSafeguard(coefficentVOs);
-        if (!flag){
-            throw new RuntimeException("保障型保险缺少必填参数!");
-        }
+
         //投保年龄系数
-        coefficentVOs = insureProcessHandler.ageHandler(coefficentVOs,insuranceVO.getId(),insured);
+
         //保费计算
-        return insureProcessHandler.premiumComputeSafeguard(insurancePlanVO,coefficentVOs);
+        return null;
     }
 
     @Override
