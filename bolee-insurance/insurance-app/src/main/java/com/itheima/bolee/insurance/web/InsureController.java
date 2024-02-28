@@ -46,8 +46,8 @@ public class InsureController {
     @ApiOperation(value = "保险投保",notes = "保险投保")
     @ApiImplicitParam(name = "doInsureVo",value = "保险产品详情Vo对象",required = true,dataType = "DoInsureVo")
     public ResponseResult<WarrantyVO> doInsure(@RequestBody DoInsureVo doInsureVo) {
-        WarrantyVO warrantyVO = warrantyService.doInsure(doInsureVo);
-        return ResponseResultBuild.successBuild(warrantyVO);
+
+        return null;
     }
 
     /**

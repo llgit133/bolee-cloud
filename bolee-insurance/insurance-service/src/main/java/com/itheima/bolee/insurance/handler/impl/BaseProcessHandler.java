@@ -621,53 +621,26 @@ public class BaseProcessHandler implements InsureProcessHandler {
     @Override
     public WarrantyTimeVO timeSetup(DoInsureVo doInsureVo,List<InsuranceCoefficentVO> coefficentVOs, InsuranceVO insuranceVO) {
         //保障起始时间
-        LocalDateTime safeguardStartTime = EmptyUtil.isNullOrEmpty(doInsureVo.getSafeguardStartTime())?
-            LocalDateTime.now():doInsureVo.getSafeguardStartTime();
+
         //犹豫期截止时间
-        LocalDateTime hesitationTime = null;
+
         //等待期截止时间
-        LocalDateTime waitTime = null;
+
         //保障截止时间
-        LocalDateTime safeguardEndTime = null;
+
         //医疗和重疾类保险才有犹豫期和等待期
-        if (doInsureVo.getCheckRule().equals(InsureConstant.CHECK_RULE_0)||
-            doInsureVo.getCheckRule().equals(InsureConstant.CHECK_RULE_1)){
-            //犹豫期截止时间
-            hesitationTime = LocalDateTimeUtil.offset(LocalDateTime.now(), insuranceVO.getHesitation(), ChronoUnit.DAYS);
-            //等待期截止时间
-            waitTime = LocalDateTimeUtil.offset(LocalDateTime.now(), insuranceVO.getWaits(), ChronoUnit.DAYS);
-        }
+
         //养老和储蓄类保险无保障结束时间
-        if (!doInsureVo.getCheckRule().equals(InsureConstant.CHECK_RULE_3)&&
-            !doInsureVo.getCheckRule().equals(InsureConstant.CHECK_RULE_4)){
+
             //保障期限
-            InsuranceCoefficentVO protectionPeriod = coefficentVOs.stream()
-                .filter(n -> { return n.getCoefficentKey().equals(InsuranceConstant.PROTECTION_PERIOD);})
-                .findFirst().get();
-            String valProtectionPeriod = JSONObject.parseObject(protectionPeriod.getCoefficentValue(), JsonAttribute.class).getUnit();
-            String calculatedVal = JSONObject.parseObject(protectionPeriod.getCoefficentValue(), JsonAttribute.class).getCalculatedVal();
-            Integer rearwardShift = 0;
+
             //推迟：年计算
-            if (valProtectionPeriod.equals(InsuranceConstant.YEAR)) {
-                rearwardShift = Integer.valueOf(calculatedVal);
-                safeguardEndTime = LocalDateTimeUtil.offset(safeguardStartTime, rearwardShift, ChronoUnit.YEARS);
-            }
+
             //推迟：月计算
-            if (valProtectionPeriod.equals(InsuranceConstant.MONTH)){
-                rearwardShift = Integer.valueOf(calculatedVal);
-                safeguardEndTime = LocalDateTimeUtil.offset(safeguardStartTime, rearwardShift, ChronoUnit.MONTHS);
-            }
+
             //推迟：天计算
-            if (valProtectionPeriod.equals(InsuranceConstant.DAY)){
-                rearwardShift = Integer.valueOf(calculatedVal);
-                safeguardEndTime = LocalDateTimeUtil.offset(safeguardStartTime, rearwardShift, ChronoUnit.DAYS);
-            }
-        }
-        return WarrantyTimeVO.builder()
-            .hesitationTime(hesitationTime)
-            .waitTime(waitTime)
-            .safeguardStartTime(safeguardStartTime)
-            .safeguardEndTime(safeguardEndTime).build();
+
+        return null;
     }
 
     @Override
