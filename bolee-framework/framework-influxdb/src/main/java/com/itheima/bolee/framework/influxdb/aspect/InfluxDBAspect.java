@@ -40,29 +40,29 @@ public class InfluxDBAspect {
 
     @Around("@annotation(select)")
     public Object select(ProceedingJoinPoint joinPoint, Select select) {
-        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-        Method method = methodSignature.getMethod();
-        Select selectAnnotation = method.getAnnotation(Select.class);
-        //获得执行参数
-        Parameter[] parameters = method.getParameters();
-        //获得执行参数值
-        Object[] args = joinPoint.getArgs();
+        //从joinPoint中获得MethodSignature，并获得Method和Select注解
+
+        //获得执行参数getParameters
+
+        //获得执行参数值getArgs
+
         //获得执行sql
-        String sql = selectAnnotation.value();
-        //替换参数
-        sql = parameterHandler.handleParameter(parameters,args,sql);
-        //注解声明返回类型
-        Class<?> resultType = selectAnnotation.resultType();
-        //查询结果
-        List<Map<String,Object>> reultList = executor.select(sql,selectAnnotation.database());
-        //根据返回类型返回结果
-        return resultSetHandler.handleResultSet(reultList, method,sql,resultType);
+
+        //parameterHandler替换参数
+
+        //注解selectAnnotation声明返回类型
+
+        //executor查询结果
+
+        //resultSetHandler根据返回类型返回结果
+        return null;
     }
 
     @Around("@annotation(insert)")
     public void insert(ProceedingJoinPoint joinPoint, Insert insert) {
         //获得执行参数值
-        Object[] args = joinPoint.getArgs();
-        executor.insert(args);
+
+        //executor执行insert
+
     }
 }

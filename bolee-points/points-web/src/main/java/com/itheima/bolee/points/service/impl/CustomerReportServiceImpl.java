@@ -144,38 +144,25 @@ public class CustomerReportServiceImpl implements ICustomerReportService {
     @Override
     public Boolean dauJob(String reportTime) {
         //判断报表时间是否指定，未指定则使用当前时间
-        if (EmptyUtil.isNullOrEmpty(reportTime)){
-            reportTime = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        }
+
         //判断统计时间是否为00:00到06:00
-        boolean flag = TimeHandlerUtils.isTimeInRange();
+
         //目标日期
-        TimeDTO targetTime = TimeHandlerUtils.getTodayTime(reportTime);
-        if (flag){
-            targetTime = TimeHandlerUtils.getYesterdayTime(reportTime);
-        }
-        QueryWrapper<Dau> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Dau::getReportTime,targetTime.getTargetDate());
-        Dau dau = dauService.getOne(queryWrapper);
-        if (!EmptyUtil.isNullOrEmpty(dau)){
-            dauService.remove(queryWrapper);
-        }
+
+        //查询结果，如果存在则删除
+
         //统计当天所有活跃用户userIds
-        List<String> allDauForUserId = businessLogMapper.allDauForUserId(targetTime.getBegin(), targetTime.getEnd());
+
         //所有活跃用户数
-        Integer allDau = allDauForUserId.size();
+
         //统计当天所有注册用户
-        List<BusinessLog> dnu = businessLogMapper.dnu(targetTime.getBegin(), targetTime.getEnd());
+
         //所有活跃新用户数
-        Integer newDau = dnu.size();
+
         //所有活跃老用户数
-        Integer oldDau = allDau-newDau;
-        dauService.save(Dau.builder()
-            .allDau(Long.valueOf(allDau))
-            .newDau(Long.valueOf(newDau))
-            .oldDau(Long.valueOf(oldDau))
-            .reportTime(targetTime.getTargetDate())
-            .build());
+
+        //保持结果
+
         return true;
     }
 
@@ -457,74 +444,26 @@ public class CustomerReportServiceImpl implements ICustomerReportService {
     @Override
     public DauVO dau(String startTime, String endTime) {
         //起始或结束时间为空则返回空结果
-        if (EmptyUtil.isNullOrEmpty(startTime)||EmptyUtil.isNullOrEmpty(endTime)){
-            return new DauVO();
-        }
+
         //查询时间范围数据
-        QueryWrapper<Dau> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().between(Dau::getReportTime,startTime,endTime).orderByAsc(Dau::getReportTime);
-        List<Dau> daus = dauService.list(queryWrapper);
-        if (EmptyUtil.isNullOrEmpty(daus)){
-            return new DauVO();
-        }
-        DauVO dauVO = new DauVO();
+
         //X轴
-        List<String> dateRange = TimeHandlerUtils.getGraduallys(startTime, endTime, TimeUnit.DAYS);
+
         //Y轴
-        List<Long> valueData = dateRange.stream()
-            .map(date -> {
-                return daus.stream()
-                    .filter(dto -> date.equals(dto.getReportTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
-                    .mapToLong(Dau::getAllDau).sum();
-            }).collect(Collectors.toList());
+
         //折线表格数据
-        LineChartsVO lineChartsVO = new LineChartsVO();
-        lineChartsVO.setLabel(dateRange);
-        lineChartsVO.setValue(valueData);
-        dauVO.setTable(lineChartsVO);
+
         //合计
-        Long total = daus.stream().mapToLong(Dau::getAllDau).sum();
-        dauVO.setTotal(total);
+
         //均值
-        LocalDate localDateStartTime = LocalDate.parse(startTime);
-        LocalDate localDateEndTime = LocalDate.parse(endTime);
-        dauVO.setAverage(new BigDecimal(total)
-            .divide(new BigDecimal(localDateStartTime.until(localDateEndTime, ChronoUnit.DAYS)),2,RoundingMode.HALF_UP));
+
         //环比上周=本日/7日前
-        Dau dauToday = daus.stream()
-            .filter(dto -> endTime.equals(dto.getReportTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
-            .findFirst().orElse(null);
-        BigDecimal dauTodayBigDecimal = BigDecimal.ZERO;
-        if (!EmptyUtil.isNullOrEmpty(dauToday)){
-            dauTodayBigDecimal = new BigDecimal(dauToday.getAllDau());
-        }
-        String earlier7Time = LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-            .plusDays(-7).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        Dau dauEarlier7 = daus.stream()
-            .filter(dto -> earlier7Time.equals(dto.getReportTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
-            .findFirst().orElse(null);
-        if (!EmptyUtil.isNullOrEmpty(dauEarlier7)&&!dauEarlier7.getAllDau().equals(0L)) {
-            BigDecimal qoqLastWeek = dauTodayBigDecimal
-                .divide(new BigDecimal(dauEarlier7.getAllDau()), 2, RoundingMode.HALF_UP)
-                .multiply(new BigDecimal(100));
-            dauVO.setQoqLastWeek(qoqLastWeek);
-        }
+
         //环比上期=本日/昨日
-        String yesterdayTime = LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-            .plusDays(-1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        Dau dauYesterday = daus.stream()
-            .filter(dto -> yesterdayTime.equals(dto.getReportTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))))
-            .findFirst().orElse(null);
-        if (!EmptyUtil.isNullOrEmpty(dauYesterday)&&!dauYesterday.getAllDau().equals(0L)) {
-            BigDecimal qoq = dauTodayBigDecimal
-                .divide(new BigDecimal(dauYesterday.getAllDau()), 2, RoundingMode.HALF_UP)
-                .multiply(new BigDecimal(100));
-            dauVO.setQoq(qoq);
-        }
+
         //当日总活跃人数
-        Long perNums = dauTodayBigDecimal.longValue();
-        dauVO.setPerNums(perNums);
-        return dauVO;
+
+        return null;
     }
 
     @Override
