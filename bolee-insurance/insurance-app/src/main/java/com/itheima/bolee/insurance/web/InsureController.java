@@ -138,7 +138,7 @@ public class InsureController {
     })
     public ResponseResult<String> signContract(@PathVariable("warrantyOrderId")String warrantyOrderId,
             @PathVariable("tradingChannel")String tradingChannel) {
-        return ResponseResultBuild.successBuild(warrantyOrderService.signContract(warrantyOrderId,tradingChannel));
+        return null;
     }
 
     /***
@@ -158,7 +158,7 @@ public class InsureController {
     public ResponseResult<Boolean> signContractSync(@PathVariable("warrantyOrderId")String warrantyOrderId,
             @PathVariable("tradingChannel")String tradingChannel,
             @PathVariable("agreementNo")String agreementNo) {
-        return ResponseResultBuild.successBuild(warrantyOrderService.signContractSync(warrantyOrderId,tradingChannel,agreementNo));
+        return null;
     }
 
     /***

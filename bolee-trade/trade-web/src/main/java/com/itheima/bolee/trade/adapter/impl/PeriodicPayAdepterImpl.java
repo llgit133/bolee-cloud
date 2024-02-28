@@ -40,12 +40,10 @@ public class PeriodicPayAdepterImpl implements PeriodicPayAdepter {
 
     @Override
     public TradeVO h5SignContract(TradeVO tradeVO) {
-        //1、从IOC容器中找到PeriodicPayHandler实现
-        String periodicPayHandlerString = periodicPayHandlers.get(tradeVO.getTradeChannel());
-        PeriodicPayHandler periodicPayHandler = registerBeanHandler
-                .getBean(periodicPayHandlerString, PeriodicPayHandler.class);
-        //2、contractDeduction支付交易处理
-        return periodicPayHandler.h5SignContract(tradeVO);
+        //从IOC容器中找到PeriodicPayHandler实现
+
+        //contractDeduction支付交易处理
+        return null;
     }
 
     @Override

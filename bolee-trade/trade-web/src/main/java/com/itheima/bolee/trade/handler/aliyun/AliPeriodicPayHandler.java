@@ -132,74 +132,46 @@ public class AliPeriodicPayHandler extends AliCommonPayHandler implements Period
     @Override
     public TradeVO h5SignContract(TradeVO tradeVO) {
         //交易前置处理：参数校验
-        Boolean flag = beforePayHandler.checkeH5Sign(tradeVO);
-        if (!flag){
-            throw new ProjectException(TradeEnum.TRAD_DEDUCTION_FAIL);
-        }
+
         //签约前置处理：幂等性处理
-        beforePayHandler.idempotentSignContract(tradeVO);
+
         //构建请求对象
-        AlipayUserAgreementPageSignRequest request = new AlipayUserAgreementPageSignRequest();
-        JSONObject bizContent = new JSONObject();
-        bizContent.put("product_code", "GENERAL_WITHHOLDING");
+
         //商家扣款场景固定为 GENERAL_WITHHOLDING
-        bizContent.put("personal_product_code", "CYCLE_PAY_AUTH_P");
+
         //商户签约号
-        bizContent.put("external_agreement_no", tradeVO.getAliPeriodicVO().getExternalAgreementNo());
+
         //签约场景
-        bizContent.put("sign_scene", tradeVO.getAliPeriodicVO().getSignScene());
+
         //周期规则参数，必填
-        JSONObject period_rule_params = new JSONObject();
+
         //周期类型 ，枚举值为 DAY 和 MONTH。周期类型使用MONTH的时候，计划扣款时间 execute_time不允许传 28 日之后的日期（可以传 28 日），以此避免有些月份可能不存在对应日期的情况。
-        period_rule_params.put("period_type", tradeVO.getAliPeriodicVO().getRulePeriodType());
+
         //必填，周期数，与 period_type 组合使用确定扣款周期，例如 period_type 为 DAY，period = 90，则扣款周期为 90 天。
-        period_rule_params.put("period", tradeVO.getAliPeriodicVO().getRulePeriod());
+
         //首次扣款的时间。非支付并签约的成功时间，必填。精确到日，格式为 yyyy-MM-dd。
-        period_rule_params.put("execute_time", tradeVO.getAliPeriodicVO().getRuleExecuteTime());
+
         //单次扣款最大金额，必填，即每次发起扣款时限制的最大金额，单位为元。商家每次发起扣款都不允许大于此金额。
-        period_rule_params.put("single_amount", tradeVO.getAliPeriodicVO().getRuleSingleAmount());
+
         //周期内允许扣款的总金额。
-        period_rule_params.put("total_amount", tradeVO.getAliPeriodicVO().getRuleTotalAmount());
+
         //总扣款次数
-        period_rule_params.put("total_payments", tradeVO.getAliPeriodicVO().getRuleTotalPayments());
-        JSONObject access_params = new JSONObject();
+
         //channel：目前支持以下值：ALIPAYAPP ：支付宝客户端 H5 页面签约。QRCODE：扫码签约。QRCODEORSMS：扫码签约或者短信签约。
-        access_params.put("channel", tradeVO.getAliPeriodicVO().getAccessChannel());
-        bizContent.put("access_params", access_params);
-        bizContent.put("period_rule_params", period_rule_params);
-        String bizContentJsonString = bizContent.toJSONString();
-        request.setBizContent(bizContentJsonString);
-        request.setNotifyUrl(tradeVO.getNotifyUrl());//设置异步通知地址
-        request.setReturnUrl(tradeVO.getReturnUrl());//跳转商家处理地址
-        AlipayClient alipayClient = aliPayConfig.createAlipayClient(tradeVO.getCompanyNo());
+
+        //设置异步通知地址
+
+        //跳转商家处理地址
+
         try {
             // 商家扣款场景请求，生成form表单
-            AlipayUserAgreementPageSignResponse response = alipayClient.pageExecute(request);
-            boolean success = response.isSuccess();
-            if (success){
+
                 //保存签约合同记录
-                SignContract signContract = SignContract.builder()
-                    .contractNo(tradeVO.getAliPeriodicVO().getContractNo())
-                    .externalAgreementNo(tradeVO.getAliPeriodicVO().getExternalAgreementNo())
-                    .signState(SignContractConstant.SIGNSTATE_TEMP)
-                    .tradeChannel(tradeVO.getTradeChannel())
-                    .rulePeriodType(tradeVO.getAliPeriodicVO().getRulePeriodType())
-                    .rulePeriod(Long.valueOf(tradeVO.getAliPeriodicVO().getRulePeriod()))
-                    .ruleTotalAmount(new BigDecimal(tradeVO.getAliPeriodicVO().getRuleTotalAmount()))
-                    .ruleSingleAmount(new BigDecimal(tradeVO.getAliPeriodicVO().getRuleSingleAmount()))
-                    .ruleTotalPayments(Long.valueOf(tradeVO.getAliPeriodicVO().getRuleTotalPayments()))
-                    .build();
-                signContractService.save(signContract);
+
                 //返回签约唤醒
-                tradeVO.setPlaceOrderCode(TradeConstant.ALI_SUCCESS_CODE);
-                tradeVO.setPlaceOrderMsg(TradeConstant.ALI_SUCCESS_MSG);
-                tradeVO.setPlaceOrderJson(response.getBody());
+
                 return tradeVO;
-            }else {
-                log.error("网关：H5先签约：{},结果：{}", tradeVO.getTradeOrderNo(),
-                        JSONObject.toJSONString(response));
-                throw new RuntimeException("网关：支付宝H5先签约创建失败！");
-            }
+
         } catch (Exception e) {
             log.error("支付宝H5先签约创建失败：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new RuntimeException("支付宝H5先签约创建失败!");

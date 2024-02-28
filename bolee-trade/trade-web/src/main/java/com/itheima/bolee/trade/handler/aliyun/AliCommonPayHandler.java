@@ -67,75 +67,40 @@ public class AliCommonPayHandler implements CommonPayHandler {
     @Override
     public TradeVO queryTrade(TradeVO tradeVO) {
         //1、查询前置处理：检测交易单参数
-        Boolean flag = beforePayHandler.checkeQueryTrade(tradeVO);
-        if (!flag){
-            throw new ProjectException(TradeEnum.CHECK_TRADE_FAIL);
-        }
-        Trade tradeHandler = tradeService.findTradByTradeOrderNo(tradeVO.getTradeOrderNo());
+
         //2、获得支付宝配置文件
-        Config config = aliPayConfig.config(tradeVO.getCompanyNo());
+
         //3、配置如果为空，抛出异常
-        if (EmptyUtil.isNullOrEmpty(config)){
-            throw new ProjectException(TradeEnum.CONFIG_ERROR);
-        }
+
         //4、使用配置
-        Factory factory = new Factory();
-        factory.setOptions(config);
+
         try {
             //5、调用支付宝API：通用查询支付情况
-            AlipayTradeQueryResponse queryResponse = factory.Common()
-                .query(String.valueOf(tradeVO.getTradeOrderNo()));
+
             //6、判断响应是否成功
-            boolean success = ResponseChecker.success(queryResponse);
+
             //7、响应成功，分析交易状态
-            if (success&&!EmptyUtil.isNullOrEmpty(queryResponse.getTradeStatus())){
-                switch (queryResponse.getTradeStatus()){
+
                     //支付取消：TRADE_CLOSED（未付款交易超时关闭，或支付完成后全额退款）
-                    case TradeConstant.ALI_TRADE_CLOSED:
-                        tradeHandler.setTradeState(TradeConstant.TRADE_CLOSED);break;
+
                     //支付成功：TRADE_SUCCESS（交易支付成功）
-                    case TradeConstant.ALI_TRADE_SUCCESS:
-                        tradeHandler.setTradeState(TradeConstant.TRADE_SUCCESS);break;
+
                     //支付成功：TRADE_FINISHED（交易结束，不可退款）
-                    case TradeConstant.ALI_TRADE_FINISHED:
-                        tradeHandler.setTradeState(TradeConstant.TRADE_SUCCESS);break;
+
                     //非最终状态不处理，当前交易状态：WAIT_BUYER_PAY（交易创建，等待买家付款）不处理
-                    default:
-                        flag = false;break;
-                }
+
+
                 //8.1、修改交易单状态
-                if (flag){
-                    tradeHandler.setResultCode(queryResponse.getSubCode());
-                    tradeHandler.setResultMsg(queryResponse.getSubMsg());
-                    tradeHandler.setResultJson(JSONObject.toJSONString(queryResponse));
-                    tradeService.updateById(tradeHandler);
+
                     //8.2 发送同步业务信息的MQ信息
-                    Long messageId = (Long) identifierGenerator.nextId(tradeHandler);
-                    MqMessage mqMessage = MqMessage.builder()
-                        .id(messageId)
-                        .title("trade-message")
-                        .content(JSONObject.toJSONString(tradeHandler))
-                        .messageType("trade-project-sync")
-                        .produceTime(Timestamp.valueOf(LocalDateTime.now()))
-                        .sender("system")
-                        .build();
-                    //指定通知的企业
-                    Message<MqMessage> message = MessageBuilder.withPayload(mqMessage)
-                            .setHeader("type", "trade-key").build();
-                    tradeSource.tradeOutput().send(message);
-                    return BeanConv.toBean(tradeHandler,TradeVO.class);
-                }else {
-                    log.info("查询支付宝交易单：{},结果：{}", tradeVO.getTradeOrderNo(),queryResponse.getTradeStatus());
-                }
-            }else {
-                throw new RuntimeException("网关：查询支付宝统一下单失败！");
-            }
+
+                    return null;
+
         } catch (Exception e) {
             log.warn("查询支付宝统一下单失败：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new RuntimeException("查询支付宝统一下单失败！");
         }
-        //7、返回结果
-        return tradeVO;
+
     }
 
     @Override

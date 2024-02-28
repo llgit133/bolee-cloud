@@ -317,65 +317,30 @@ public class WarrantyOrderServiceImpl extends ServiceImpl<WarrantyOrderMapper, W
     @Transactional
     public String signContract(String warrantyOrderId, String tradingChannel) {
         //复核合同订单信息
-        WarrantyOrderVO warrantyOrderVO = findByIdAndOrderState(warrantyOrderId,WarrantyOrderConstant.ORDER_STATE_0);
-        if (EmptyUtil.isNullOrEmpty(warrantyOrderVO)){
-            throw new RuntimeException("合同订单查询异常");
-        }
-        UserVO userVO = SubjectContent.getUserVO();
+
+
         //签约交易对象
-        TradeVO tradeVO = TradeVO.builder()
-            .productOrderNo(Long.valueOf(warrantyOrderVO.getOrderNo()))
-            .tradeChannel(tradingChannel)
-            .payerId(userVO.getId())
-            .companyNo(warrantyOrderVO.getCompanyNo())
-            .payerName(userVO.getRealName())
-            .notifyUrl("http://www.eeho.cn")
-            .returnUrl("http://www.eeho.cn")
-            .tradeAmount(BigDecimal.ZERO)
-            .refund(BigDecimal.ZERO)
-            .isRefund(SuperConstant.NO)
-            .memo("保单"+warrantyOrderVO.getWarrantyNo()+"第"+warrantyOrderVO.getCurrentPeriod()+"期")
-            .build();
+
         //支付宝周期扣款对象
-        if (TradeConstant.TRADE_CHANNEL_ALI_PAY.equals(tradingChannel)){
-            AliPeriodicVO aliPeriodicVO = AliPeriodicVO.builder()
-                .signScene("INDUSTRY|REPAYMENT")
-                .ruleTotalAmount(String.valueOf(warrantyOrderVO.getPremiums()))
-                .ruleSingleAmount(String.valueOf(warrantyOrderVO.getPremium()))
-                .ruleTotalPayments(String.valueOf(warrantyOrderVO.getPeriods()))
-                .externalAgreementNo(String.valueOf(identifierGenerator.nextId(warrantyOrderVO)))
-                .accessChannel("ALIPAYAPP")
-                .contractNo(warrantyOrderVO.getWarrantyNo())
-                .build();
+
             //签约扣款：周期数、周期类型、下次扣款時間
-            String rulePeriod = null;
-            String rulePeriodType = null;
-            if (InsuranceConstant.WEEK.equals(warrantyOrderVO.getPeriodicUnit())){
-                rulePeriodType = InsuranceConstant.DAY;
-                rulePeriod ="7";
-            }else if (InsuranceConstant.MONTH.equals(warrantyOrderVO.getPeriodicUnit())){
-                rulePeriodType = InsuranceConstant.MONTH;
-                rulePeriod ="1";
-            }else if (InsuranceConstant.YEAR.equals(warrantyOrderVO.getPeriodicUnit())){
-                rulePeriodType = InsuranceConstant.MONTH;
-                rulePeriod ="12";
-            }
-            aliPeriodicVO.setRulePeriod(rulePeriod);
-            aliPeriodicVO.setRulePeriodType(rulePeriodType);
-            aliPeriodicVO.setRuleExecuteTime(warrantyOrderVO.getScheduleTime()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-            tradeVO.setAliPeriodicVO(aliPeriodicVO);
+
+            //周
+
+            //月
+
+            //年
+
+            //指定周期
+
         //微信周期扣款对象
-        }else if(TradeConstant.TRADE_CHANNEL_WECHAT_PAY.equals(tradingChannel)){
-            throw new RuntimeException("微信周期扣款未开发");
+
         //未定义周期扣款
-        }else {
-            throw new RuntimeException("未定义的周期性扣款");
-        }
+
         //发起签约
-        TradeVO tradeVOResult  = periodicPayFeign.h5SignContract(tradeVO);
+
         //返回签约签名
-        return tradeVOResult.getPlaceOrderJson();
+        return null;
     }
 
     @Autowired
@@ -388,51 +353,28 @@ public class WarrantyOrderServiceImpl extends ServiceImpl<WarrantyOrderMapper, W
     @GlobalTransactional
     public Boolean signContractSync(String warrantyOrderId, String tradingChannel, String agreementNo) {
         //合同订单信息
-        WarrantyOrderVO warrantyOrderVO = findById(warrantyOrderId);
-        if (EmptyUtil.isNullOrEmpty(warrantyOrderVO)){
-            throw new RuntimeException("合同订单不存在");
-        }
+
         //保险合同加锁：防止删除同时，计划任务在进行周期性扣款
-        String key = "lock_warranty:"+warrantyOrderVO.getWarrantyNo();
-        RLock fairLock = redissonClient.getFairLock(key);
+
         try {
-            if (fairLock.tryLock(CacheConstant.REDIS_WAIT_TIME, TimeUnit.SECONDS)){
+            //加锁
+
                 //合同订单关联支付签约号
-                UpdateWrapper<WarrantyOrder> updateWrapper = new UpdateWrapper<>();
-                updateWrapper.lambda()
-                    .set(WarrantyOrder::getAgreementNo,agreementNo)
-                    .set(WarrantyOrder::getTradingChannel,tradingChannel)
-                    .eq(WarrantyOrder::getWarrantyNo,warrantyOrderVO.getWarrantyNo());
-                boolean flag = update(updateWrapper);
-                if (!flag){
-                    throw new RuntimeException("合同订单关联支付签约号异常");
-                }
+
                 //支付平台同步签约结果
-                warrantyOrderVO.setAgreementNo(agreementNo);
-                warrantyOrderVO.setTradingChannel(tradingChannel);
-                flag = periodicPayFeign.signContractSync(warrantyOrderVO.getWarrantyNo(),tradingChannel,agreementNo);
-                if (!flag){
-                    throw new RuntimeException("签约合同关联支付签约号异常");
-                }
+
                 //扣除首期款项
-                flag = this.installmentDeduction(BeanConv.toBean(warrantyOrderVO,WarrantyOrder.class));
-                if (!flag){
-                    throw new RuntimeException("合同订单关联支付签约号异常");
-                }
+
                 //修改保险合同状态
-                UpdateWrapper<Warranty> warrantyUpdateWrapper = new UpdateWrapper<>();
-                warrantyUpdateWrapper.lambda()
-                    .set(Warranty::getWarrantyState,WarrantyConstant.STATE_SAFEING)
-                    .eq(Warranty::getWarrantyNo,warrantyOrderVO.getWarrantyNo());
-                return warrantyService.update(warrantyUpdateWrapper);
-            }
+
+                return null;
+
         }catch (Exception e){
             log.error("保险合同加锁失败：{}",ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(WarrantyEnum.DEL_FAIL);
         }finally {
-            fairLock.unlock();
+            //释放锁
         }
-        return false;
 
     }
 
@@ -499,23 +441,8 @@ public class WarrantyOrderServiceImpl extends ServiceImpl<WarrantyOrderMapper, W
         LocalDateTime localDateTime = LocalDateTime.now();
         String minTime = localDateTime.with(LocalTime.MIN).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String maxTime = localDateTime.with(LocalTime.MAX).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));;
-        QueryWrapper<WarrantyOrder> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda()
-            .between(WarrantyOrder::getScheduleTime, minTime,maxTime)
-            .gt(WarrantyOrder::getPeriods,1);
-        List<WarrantyOrder> warrantyOrderList = list(queryWrapper);
-        if (EmptyUtil.isNullOrEmpty(warrantyOrderList)){
-            return true;
-        }
+
         //线程处周期性扣款
-        for (WarrantyOrder warrantyOrder: warrantyOrderList) {
-            periodicPayExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    installmentDeduction(warrantyOrder);
-                }
-            });
-        }
         return true;
     }
 
