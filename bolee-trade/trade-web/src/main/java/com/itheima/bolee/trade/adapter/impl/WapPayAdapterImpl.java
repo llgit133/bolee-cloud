@@ -36,11 +36,10 @@ public class WapPayAdapterImpl implements WapPayAdapter {
 
     @Override
     public TradeVO wapTrade(TradeVO tradeVO) {
-        //2、从IOC容器中找到WapPayHandler实现
-        String wapPayHandlerString = wapPayHandlers.get(tradeVO.getTradeChannel());
-        WapPayHandler wapPayHandler = registerBeanHandler.getBean(wapPayHandlerString, WapPayHandler.class);
-        //3、wapTrade支付交易处理
-        TradeVO tradeVOResult = wapPayHandler.wapTrade(tradeVO);
-        return tradeVOResult;
+        //从IOC容器中找到WapPayHandler实现
+
+        //wapTrade支付交易处理
+
+        return null;
     }
 }

@@ -104,7 +104,7 @@ public class InsureController {
     })
     public ResponseResult<TradeVO> doPayment(@PathVariable("warrantyOrderId")String warrantyOrderId,
             @PathVariable("tradingChannel")String tradingChannel) {
-        return ResponseResultBuild.successBuild(warrantyOrderService.doPayment(warrantyOrderId,tradingChannel));
+        return null;
     }
 
     /***

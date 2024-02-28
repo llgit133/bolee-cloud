@@ -31,22 +31,17 @@ public class WapPayFaceImpl implements WapPayFace {
 
     @Override
     public TradeVO wapTrade(TradeVO tradeVO) {
-        //1、对交易订单加锁
-        Long productOrderNo = tradeVO.getProductOrderNo();
-        String key = TradeCacheConstant.CREATE_PAY + productOrderNo;
-        RLock lock = redissonClient.getFairLock(key);
+        //构建锁对象
+
         try {
-            if (lock.tryLock(TradeCacheConstant.REDIS_WAIT_TIME, TimeUnit.SECONDS)){
-                return wapPayAdapter.wapTrade(tradeVO);
-            }else {
-                throw new ProjectException(TradeEnum.TRAD_PAY_FAIL);
-            }
+            //加锁处理
+
+            return null;
         } catch (Exception e) {
             log.error("统一收单线下交易预创建异常:{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(TradeEnum.TRAD_PAY_FAIL);
         }finally {
-            //释放锁
-            lock.unlock();
+
         }
 
     }

@@ -281,26 +281,14 @@ public class WarrantyOrderServiceImpl extends ServiceImpl<WarrantyOrderMapper, W
     @Override
     public TradeVO doPayment(String warrantyOrderId, String tradingChannel) {
         //重新查询合同订单信息
-        WarrantyOrderVO warrantyOrderVO = findById(warrantyOrderId);
-        if (EmptyUtil.isNullOrEmpty(warrantyOrderVO)){
-            throw new RuntimeException("合同订单查询异常");
-        }
+
         //用户信息
-        UserVO userVO = SubjectContent.getUserVO();
+
         //订单支付
-        TradeVO tradeVO = TradeVO.builder()
-            .productOrderNo(Long.valueOf(warrantyOrderVO.getOrderNo()))
-            .tradeChannel(tradingChannel)
-            .payerId(userVO.getId())
-            .companyNo(warrantyOrderVO.getCompanyNo())
-            .payerName(userVO.getRealName())
-            .tradeAmount(warrantyOrderVO.getPremium())
-            .refund(BigDecimal.ZERO)
-            .isRefund(SuperConstant.NO)
-            .memo("保单"+warrantyOrderVO.getWarrantyNo()+"第"+warrantyOrderVO.getCurrentPeriod()+"期")
-            .build();
-        TradeVO tradeVOResult = wapPayFeign.wapTrade(tradeVO);
-        return tradeVOResult;
+
+        //调用接口
+
+        return null;
     }
 
     @Override
