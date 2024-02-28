@@ -37,91 +37,45 @@ public class AliyunSmsSignHandlerImpl implements SmsSignHandler {
     @Override
     public SmsSign addSmsSign(SmsSignVO smsSignVO){
         //查询当前签名是否保存过
-        SmsSignVO smsSignHandler = smsSignService.findSmsSignBySignNameAndChannelLabel
-                        (smsSignVO.getSignName(),smsSignVO.getChannelLabel());
+
         //保存过则同步远程数据
-        if (!EmptyUtil.isNullOrEmpty(smsSignHandler)){
-            smsSignVO = BeanConv.toBean(smsSignHandler,SmsSignVO.class);
+
             //查询当前签名在远程的是否存在
-            QuerySmsSignResponse querySmsSignResponse = query(smsSignVO);
-            String codeQuery = querySmsSignResponse.getBody().getCode();
-            if ("OK".equals(codeQuery)){
-                Integer SignStatus =querySmsSignResponse.getBody().getSignStatus();
+
+
                 //受理成功
-                smsSignVO.setAcceptStatus(SmsConstant.STATUS_ACCEPT_0);
-                smsSignVO.setAcceptMsg("受理成功");
-                smsSignVO.setSignCode(smsSignVO.getSignName());
+
                 //审核通过
-                if (SignStatus==1){
-                    smsSignVO.setAuditStatus(SmsConstant.STATUS_AUDIT_0);
-                    smsSignVO.setAuditMsg("审核通过");
+
                 //审核失败
-                }else if (SignStatus==2){
-                    smsSignVO.setAuditStatus(SmsConstant.STATUS_AUDIT_1);
-                    smsSignVO.setAuditMsg(querySmsSignResponse.getBody().getReason());
-                }else {
-                    smsSignVO.setAuditStatus(SmsConstant.STATUS_AUDIT_2);
-                    smsSignVO.setAuditMsg(querySmsSignResponse.getBody().getReason());
-                }
-                SmsSign smsSign = BeanConv.toBean(smsSignVO, SmsSign.class);
-                boolean flag = smsSignService.saveOrUpdate(smsSign);
-                if (flag){
-                    return smsSign;
-                }
-                throw new ProjectException(SmsSignEnum.CREATE_FAIL);
-            }
-        }
+
+                //保存结果
+
         //构建请求对象
-        AddSmsSignRequest addSmsSignRequest = new AddSmsSignRequest();
+
         //签名名称
-        addSmsSignRequest.setSignName(smsSignVO.getSignName());
+
         //签名来源
-        addSmsSignRequest.setSignSource(Integer.valueOf(smsSignVO.getSignType()));
+
         //申请说明
-        addSmsSignRequest.setRemark(smsSignVO.getRemark());
+
         //证明材料SignFileList
-        List<AddSmsSignRequest.AddSmsSignRequestSignFileList> signFileList = new ArrayList<>();
-        String[] proofTypes = smsSignVO.getProofType().split("@");
-        String[] proofImages = smsSignVO.getProofImage().split("@");
-        for (int i = 0 ; i<proofImages.length;i++) {
-            AddSmsSignRequest.AddSmsSignRequestSignFileList signFile = new AddSmsSignRequest.AddSmsSignRequestSignFileList();
-            signFile.setFileContents(proofImages[i]);
-            signFile.setFileSuffix(proofTypes[i]);
-            signFileList.add(signFile);
-        }
-        addSmsSignRequest.setSignFileList(signFileList);
+
         //获得客户端
-        Client client =aliyunSmsConfig.queryClient();
+
         //发起三方请求
-        AddSmsSignResponse response = null;
-        try {
-            response = client.addSmsSign(addSmsSignRequest);
-        } catch (Exception e) {
-            log.error("请求添加阿里云签名出错：{}", ExceptionsUtil.getStackTraceAsString(e));
-            throw new ProjectException(SmsSignEnum.CREATE_FAIL);
-        }
+
         //同步结果并保存
-        String code = response.getBody().getCode();
-        String message = response.getBody().getMessage();
-        if ("OK".equals(code)){
+
             //受理成功
-            smsSignVO.setAcceptStatus(SmsConstant.STATUS_ACCEPT_0);
-            smsSignVO.setAcceptMsg("受理成功");
-            smsSignVO.setSignCode(smsSignVO.getSignName());
+
             //审核中
-            smsSignVO.setAuditStatus(SmsConstant.STATUS_AUDIT_2);
-            smsSignVO.setAuditMsg("审核中");
-            smsSignVO.setSignCode(smsSignVO.getSignName());
-        }else {
-            smsSignVO.setAcceptStatus(SmsConstant.STATUS_ACCEPT_1);
-            smsSignVO.setAcceptMsg(message);
-        }
-        SmsSign smsSign = BeanConv.toBean(smsSignVO, SmsSign.class);
-        boolean flag = smsSignService.save(smsSign);
-        if (flag){
-            return smsSign;
-        }
-        throw new ProjectException(SmsSignEnum.CREATE_FAIL);
+
+
+            //受理失败
+
+        //保持信息
+        return null;
     }
 
     @Override
@@ -141,56 +95,31 @@ public class AliyunSmsSignHandlerImpl implements SmsSignHandler {
 
     @Override
     public SmsSign modifySmsSign(SmsSignVO smsSignVO){
-        ModifySmsSignRequest modifySmsSignRequest = new ModifySmsSignRequest();
+        //构建请求对象
+
         //签名名称
-        modifySmsSignRequest.setSignName(smsSignVO.getSignName());
+
         //签名来源。取值：
-        modifySmsSignRequest.setSignSource(Integer.valueOf(smsSignVO.getSignType()));
+
         //申请说明
-        modifySmsSignRequest.setRemark(smsSignVO.getRemark());
+
         //证明材料SignFileList
-        List<ModifySmsSignRequest.ModifySmsSignRequestSignFileList> signFileList = new ArrayList<>();
-        String[] proofTypes = smsSignVO.getProofType().split("@");
-        String[] proofImages = smsSignVO.getProofImage().split("@");
-        for (int i = 0 ; i<proofImages.length;i++) {
-            ModifySmsSignRequest.ModifySmsSignRequestSignFileList signFile = new ModifySmsSignRequest.ModifySmsSignRequestSignFileList();
-            signFile.setFileContents(proofImages[i]);
-            signFile.setFileSuffix(proofTypes[i]);
-            signFileList.add(signFile);
-        }
-        modifySmsSignRequest.setSignFileList(signFileList);
+
         //同步结果并保存
-        Client client =aliyunSmsConfig.queryClient();
-        ModifySmsSignResponse response = null;
-        try {
-            response = client.modifySmsSign(modifySmsSignRequest);
-        } catch (Exception e) {
-            log.error("请求修改阿里云签名出错：{}", ExceptionsUtil.getStackTraceAsString(e));
-            throw new ProjectException(SmsSignEnum.UPDATE_FAIL);
-        }
+
         //处理结果
-        String code = response.getBody().getCode();
-        String message = response.getBody().getMessage();
-        if ("OK".equals(code)){
+
             //受理成功
-            smsSignVO.setAcceptStatus(SmsConstant.STATUS_ACCEPT_0);
-            smsSignVO.setAcceptMsg("受理成功");
+
             //审核中
-            smsSignVO.setAuditStatus(SmsConstant.STATUS_ACCEPT_2);
-            smsSignVO.setAuditMsg("审核中");
-            smsSignVO.setSignCode(smsSignVO.getSignName());
-        }else {
+
+
             //受理失败
-            smsSignVO.setAcceptStatus(SmsConstant.STATUS_ACCEPT_1);
-            smsSignVO.setAcceptMsg(message);
+
             //重置审核状态
-            smsSignVO.setAuditStatus(null);
-            smsSignVO.setAuditMsg(null);
-            smsSignVO.setSignCode(null);
-        }
-        SmsSign smsSign = BeanConv.toBean(smsSignVO, SmsSign.class);
-        smsSignService.updateById(smsSign);
-        return smsSign;
+
+
+        return null;
     }
 
     private QuerySmsSignResponse query(SmsSignVO smsSignVO) {

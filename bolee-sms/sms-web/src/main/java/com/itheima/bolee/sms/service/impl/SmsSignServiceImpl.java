@@ -110,33 +110,14 @@ public class SmsSignServiceImpl extends ServiceImpl<SmsSignMapper, SmsSign> impl
     public SmsSignVO addSmsSign(SmsSignVO smsSignVO) throws ProjectException{
         try {
             //获取证明资料相关
-            LinkedList<FileVO> fileVos = smsSignVO.getFileVOs();
-            StringBuffer base64Image =new StringBuffer();
-            StringBuffer suffix =new StringBuffer();
-            for (FileVO fileVO : fileVos) {
-                FileVO fileVOHandler = fileDownLoadFeign.downLoad(fileVO.getId());
-                if (!EmptyUtil.isNullOrEmpty(fileVOHandler)){
-                    base64Image.append(fileVOHandler.getBase64Image()).append("@");
-                    suffix.append(fileVOHandler.getSuffix()).append("@");
-                }
-            }
+
             //填充签名文件属性
-            if (!EmptyUtil.isNullOrEmpty(base64Image)&&!EmptyUtil.isNullOrEmpty(suffix)){
-                String base64ImageString = base64Image.toString();
-                String suffixString = suffix.toString();
-                smsSignVO.setProofImage(base64ImageString.substring(0,base64ImageString.length()-1));
-                smsSignVO.setProofType(suffixString.substring(0,suffixString.length()-1));
-            }
+
             //调用签名三方API
-            SmsSignVO smsSignVOHandler = smsSignAdapter.addSmsSign(smsSignVO);
+
             //签名业务附件关联
-            if (!EmptyUtil.isNullOrEmpty(smsSignVOHandler)){
-                List<FileVO> fileVosHandler = fileVos.stream()
-                        .map(n -> FileVO.builder().id(n.getId()).businessId(smsSignVOHandler.getId()).build())
-                        .collect(Collectors.toList());
-                fileBusinessFeign.bindBatchFile(Lists.newArrayList(fileVosHandler));
-            }
-            return smsSignVOHandler;
+
+            return null;
         } catch (Exception e) {
             log.error("添加签名异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(SmsSignEnum.CREATE_FAIL);
@@ -172,30 +153,14 @@ public class SmsSignServiceImpl extends ServiceImpl<SmsSignMapper, SmsSign> impl
     public SmsSignVO modifySmsSign(SmsSignVO smsSignVO)throws ProjectException {
         try {
             //获取证明资料相关
-            LinkedList<FileVO> fileVos = smsSignVO.getFileVOs();
-            StringBuffer base64Image =new StringBuffer();
-            StringBuffer suffix =new StringBuffer();
-            for (FileVO fileVO : fileVos) {
-                FileVO fileVOHandler = fileDownLoadFeign.downLoad(fileVO.getId());
-                if (!EmptyUtil.isNullOrEmpty(fileVOHandler)){
-                    base64Image.append(fileVOHandler.getBase64Image()).append("@");
-                    suffix.append(fileVOHandler.getSuffix()).append("@");
-                }
-            }
+
             //填充签名文件属性
-            if (!EmptyUtil.isNullOrEmpty(base64Image)&&!EmptyUtil.isNullOrEmpty(suffix)){
-                String base64ImageString = base64Image.toString();
-                String suffixString = suffix.toString();
-                smsSignVO.setProofImage(base64ImageString.substring(0,base64ImageString.length()-1));
-                smsSignVO.setProofType(suffixString.substring(0,suffixString.length()-1));
-            }
+
             //调用签名三方API
-            SmsSignVO smsSignVOHandler = smsSignAdapter.modifySmsSign(smsSignVO);
+
             //替换签名附件相关
-            if (!EmptyUtil.isNullOrEmpty(smsSignVOHandler)){
-                fileBusinessFeign.replaceBindBatchFile(Lists.newArrayList(fileVos));
-            }
-            return smsSignVO;
+
+            return null;
         } catch (Exception e) {
             log.error("修改签名异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(SmsSignEnum.UPDATE_FAIL);

@@ -55,85 +55,27 @@ public class AliyunSmsSendHandlerImpl implements SmsSendHandler {
                            Set<String> mobiles,
                            LinkedHashMap<String, String> templateParam) throws ProjectException {
         //超过发送上限
-        if (mobiles.size()>1000){
-            throw new ProjectException(SmsSendEnum.PEXCEED_THE_LIMIT);
-        }
-        SendBatchSmsRequest request = new SendBatchSmsRequest();
+
         //接收短信的手机号码，JSON数组格式。
-        request.setPhoneNumberJson(JSONObject.toJSONString(mobiles));
+
         //签名处理
-        String signCode = smsSign.getSignCode();
-        List<String> signNames = new ArrayList<>();
-        for (String mobile : mobiles) {
-            signNames.add(signCode);
-        }
-        request.setSignNameJson(JSONObject.toJSONString(signNames));
+
         //模板处理
-        request.setTemplateCode(smsTemplate.getTemplateCode());
+
         //模板参数
-        List<Map<String, String>> templateParams = new ArrayList<>();
-        for (String mobile : mobiles) {
-            templateParams.add(templateParam);
-        }
-        request.setTemplateParamJson(JSONObject.toJSONString(templateParams));
+
         //发送短信
-        Client client =aliyunSmsConfig.queryClient();
-        SendBatchSmsResponse response = null;
-        try {
-            response = client.sendBatchSms(request);
-        } catch (Exception e) {
-            log.error("阿里云发送短信：{}，失败",request.toString());
-            throw new ProjectException(SmsSendEnum.SEND_FAIL);
-        }
+
         //三方结果
-        String code = response.getBody().getCode();
-        String acceptStatus = null;
-        String acceptMsg = null;
-        String sendStatus = null;
-        String sendMsg = null;
-        if ("OK".equals(code)){
+
             //受理成功
-            acceptStatus = SmsConstant.STATUS_ACCEPT_0;
-            acceptMsg = "受理成功";
-            sendStatus = SmsConstant.STATUS_SEND_2;
-            sendMsg = "发送中";
-        }else {
+
+
             //受理失败
-            acceptStatus=SmsConstant.STATUS_ACCEPT_1;
-            acceptMsg = response.getBody().getMessage();
-            sendStatus = SmsConstant.STATUS_SEND_1;
-            sendMsg = "发送失败";
-        }
+
         //构建发送记录
-        String message = response.getBody().getMessage();
-        String bizId = response.getBody().getBizId();
-        String content = smsTemplate.getContent();
-        for (Map.Entry<String, String> entry : templateParam.entrySet()) {
-            content = content.replace(entry.getKey(), entry.getValue());
-        }
-        List<SmsSendRecord> sendRecords = new ArrayList<>();
-        for (String mobile : mobiles) {
-            SmsSendRecord smsSendRecord = SmsSendRecord.builder()
-                    .sendContent(content)
-                    .channelLabel(smsChannel.getChannelLabel())
-                    .channelName(smsChannel.getChannelName())
-                    .acceptStatus(acceptStatus)
-                    .acceptMsg(acceptMsg)
-                    .sendStatus(sendStatus)
-                    .sendMsg(sendMsg)
-                    .mobile(mobile)
-                    .signCode(smsSign.getSignCode())
-                    .signName(smsSign.getSignName())
-                    .templateNo(smsTemplate.getTemplateNo())
-                    .templateCode(smsTemplate.getTemplateCode())
-                    .templateId(smsTemplate.getId())
-                    .templateType(smsTemplate.getSmsType())
-                    .serialNo(bizId)
-                    .templateParams(JSONObject.toJSONString(templateParam))
-                    .build();
-            sendRecords.add(smsSendRecord);
-        }
-        return smsSendRecordService.saveBatch(sendRecords);
+
+        return null;
     }
 
     @Override

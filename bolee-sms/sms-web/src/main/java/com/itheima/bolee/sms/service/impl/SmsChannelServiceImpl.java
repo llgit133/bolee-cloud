@@ -44,29 +44,8 @@ public class SmsChannelServiceImpl extends ServiceImpl<SmsChannelMapper, SmsChan
     @Cacheable(value = SmsCacheConstant.PAGE_CHANNEL,key ="#pageNum+'-'+#pageSize+'-'+#smsChannelVO.hashCode()")
     public Page<SmsChannelVO> findSmsChannelVOPage(SmsChannelVO smsChannelVO, int pageNum, int pageSize) {
         try {
-            Page<SmsChannel> page = new Page<>(pageNum,pageSize);
-            QueryWrapper<SmsChannel> queryWrapper = new QueryWrapper<>();
 
-            if (!EmptyUtil.isNullOrEmpty(smsChannelVO.getChannelLabel())) {
-                queryWrapper.lambda().eq(SmsChannel::getChannelLabel,smsChannelVO.getChannelLabel());
-            }
-            if (!EmptyUtil.isNullOrEmpty(smsChannelVO.getChannelName())) {
-                queryWrapper.lambda().likeRight(SmsChannel::getChannelName,smsChannelVO.getChannelName());
-            }
-            if (!EmptyUtil.isNullOrEmpty(smsChannelVO.getDataState())) {
-                queryWrapper.lambda().eq(SmsChannel::getDataState,smsChannelVO.getDataState());
-            }
-            queryWrapper.lambda().orderByAsc(SmsChannel::getCreateTime);
-            Page<SmsChannelVO> pageVo = BeanConv.toPage(page(page, queryWrapper),SmsChannelVO.class);
-            //结果集转换
-            List<SmsChannelVO> smsChannelVOs =pageVo.getRecords();
-            if (!EmptyUtil.isNullOrEmpty(smsChannelVOs)){
-                smsChannelVOs.forEach(n->{
-                    List <OtherConfigVO> list = JSONArray.parseArray(n.getOtherConfig(),OtherConfigVO.class);
-                    n.setOtherConfigs(list);
-                });
-            }
-            return pageVo;
+            return null;
         } catch (Exception e) {
             log.error("查询通道列表异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(SmsChannelEnum.PAGE_FAIL);
@@ -81,10 +60,8 @@ public class SmsChannelServiceImpl extends ServiceImpl<SmsChannelMapper, SmsChan
         put={@CachePut(value =SmsCacheConstant.PREFIX_CHANNEL,key = "#result.channelLabel")})
     public SmsChannelVO createSmsChannel(SmsChannelVO smsChannelVO) {
         try {
-            SmsChannel smsChannel = BeanConv.toBean(smsChannelVO, SmsChannel.class);
-            smsChannel.setOtherConfig(JSONObject.toJSONString(smsChannelVO.getOtherConfigs()));
-            boolean flag = save(smsChannel);
-            return BeanConv.toBean( smsChannel, SmsChannelVO.class);
+
+            return null;
         } catch (Exception e) {
             log.error("保存通道异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(SmsChannelEnum.CREATE_FAIL);
@@ -99,10 +76,8 @@ public class SmsChannelServiceImpl extends ServiceImpl<SmsChannelMapper, SmsChan
         @CacheEvict(value = SmsCacheConstant.PREFIX_CHANNEL,key = "#smsChannelVO.channelLabel")})
     public SmsChannelVO updateSmsChannel(SmsChannelVO smsChannelVO) {
         try {
-            SmsChannel smsChannel = BeanConv.toBean(smsChannelVO, SmsChannel.class);
-            smsChannel.setOtherConfig(JSONObject.toJSONString(smsChannelVO.getOtherConfigs()));
-            updateById(smsChannel);
-            return BeanConv.toBean(smsChannel,smsChannelVO.getClass());
+
+            return null;
         } catch (Exception e) {
             log.error("保存通道异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(SmsChannelEnum.UPDATE_FAIL);
@@ -146,11 +121,7 @@ public class SmsChannelServiceImpl extends ServiceImpl<SmsChannelMapper, SmsChan
             @CacheEvict(value = SmsCacheConstant.PREFIX_CHANNEL,allEntries = true)})
     public Boolean deleteSmsChannel(String[] checkedIds) {
         try {
-            List<String> ids = Arrays.asList(checkedIds);
-            for (String id : ids) {
-                SmsChannel smsChannel = getById(id);
-                removeById(id);
-            }
+
             return true;
         } catch (Exception e) {
             log.error("删除通道异常：{}", ExceptionsUtil.getStackTraceAsString(e));
@@ -163,9 +134,8 @@ public class SmsChannelServiceImpl extends ServiceImpl<SmsChannelMapper, SmsChan
     @Cacheable(value =SmsCacheConstant.CHANNEL_LIST)
     public List<SmsChannelVO> findSmsChannelVOList() {
         try {
-            QueryWrapper<SmsChannel> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().eq(SmsChannel::getDataState, SuperConstant.DATA_STATE_0);
-            return BeanConv.toBeanList(list(queryWrapper),SmsChannelVO.class);
+
+            return null;
         } catch (Exception e) {
             log.error("查找所有通道异常：{}", ExceptionsUtil.getStackTraceAsString(e));
             throw new ProjectException(SmsChannelEnum.SELECT_FAIL);
