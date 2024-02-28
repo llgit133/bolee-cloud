@@ -52,9 +52,7 @@ public class CacheServerHttpRequestDecorator extends ServerHttpRequestDecorator 
 
     private void addHeaders(ServerHttpRequest request,byte[] bytes) {
         //请求体信息
-        String requesBody = RequestHelper.readRequestBody(request,bytes);
-        String replaceString = requesBody.replaceAll("\t|\n|\r", "").replaceAll(" ","");
-        request.mutate().header("requesBody", replaceString).build();
+
     }
 
 }

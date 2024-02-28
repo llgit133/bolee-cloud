@@ -91,9 +91,9 @@ public class CacheServerHttpResponseDecorator extends ServerHttpResponseDecorato
      */
     private void trace(ServerHttpRequest request, ResponseResult responseResult) {
         //创建请求日志记录
-        String logJsonString = createLogJsonString(request, responseResult);
+
         //发送队列延迟信息
-        sendLogJsonString(logJsonString);
+
     }
 
     /**
@@ -102,17 +102,7 @@ public class CacheServerHttpResponseDecorator extends ServerHttpResponseDecorato
      */
     private void sendLogJsonString(String logBusinessVOJsonString) {
         //发送队列信息
-        MqMessage mqMessage = MqMessage.builder()
-            .id(messageId)
-            .title("log-message")
-            .content(logBusinessVOJsonString)
-            .messageType("log-request")
-            .produceTime(Timestamp.valueOf(LocalDateTime.now()))
-            .sender(sender)
-            .build();
-        Message<MqMessage> message = MessageBuilder.withPayload(mqMessage).setHeader("type", "log-key").build();
-        boolean flag = logSource.logOutput().send(message);
-        log.info("发送：{}结果：{}",mqMessage.toString(),flag);
+
     }
 
     /**
